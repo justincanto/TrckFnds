@@ -62,3 +62,13 @@ export const authenticators = pgTable(
     }),
   })
 );
+
+export const bankConnection = pgTable("bankConnection", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  accessToken: text("accessToken").notNull(),
+});

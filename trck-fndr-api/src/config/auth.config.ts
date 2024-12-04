@@ -9,4 +9,10 @@ export const authConfig: ExpressAuthConfig = {
   session: {
     strategy: "jwt",
   },
+  callbacks: {
+    session: async ({ session, token }) => {
+      session.user.id = token.sub!;
+      return session;
+    },
+  },
 };

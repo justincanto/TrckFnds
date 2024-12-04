@@ -18,5 +18,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     authorized: async ({ request, auth }) => {
       return !!auth || !request.url.includes("dashboard");
     },
+    session: async ({ session, token }) => {
+      session.user.id = token.sub!;
+      return session;
+    },
   },
 });
