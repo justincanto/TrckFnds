@@ -11,6 +11,7 @@ import {
 import type { AdapterAccountType } from "@auth/express/adapters";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
+import { Blockchain, Crypto } from "../crypto/types";
 
 export const users = pgTable("user", {
   id: text("id")
@@ -100,9 +101,6 @@ export const BlockchainEnum = pgEnum("blockchain_enum", [
   "optimism",
 ]);
 
-export const blockchain = z.enum(BlockchainEnum.enumValues);
-export type Blockchain = z.infer<typeof blockchain>;
-
 export const ethWalletConnection = pgTable("ethWalletConnection", {
   id: text("id")
     .primaryKey()
@@ -113,6 +111,7 @@ export const ethWalletConnection = pgTable("ethWalletConnection", {
   address: text("address").notNull(),
   name: text("name").notNull(),
   blockchains: BlockchainEnum()
+    .$type<Blockchain[]>()
     .array()
     .default(sql`'{"ethereum"}'::blockchain_enum[]`)
     .notNull(),
@@ -123,8 +122,10 @@ export const erc20Token = pgTable("erc20Token", {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   symbol: text("symbol").notNull(),
+  cryptoId: text("cryptoId").$type<Crypto>().notNull(),
   name: text("name").notNull(),
   contractAddress: text("contractAddress").notNull(),
+  decimals: integer("decimals").notNull(),
   blockchain: BlockchainEnum().notNull(),
 });
 

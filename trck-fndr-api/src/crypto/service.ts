@@ -5,14 +5,13 @@ import {
   erc20TokenInWallet,
   ethWalletConnection,
 } from "../db/schema";
-import { BLOCKCHAINS } from "./constants";
+import { BLOCKCHAINS, ERC20_BALANCE_OF_ABI } from "./constants";
 import { Crypto } from "./types";
 import axios from "axios";
 
 export const getCryptoAccountsOverview = async (userId: string) => {
-  //get eth balances
   const ethWalletBalances = await getEthBalances(userId);
-  const balance = ethWalletBalances.reduce(
+  const ethTotalBalance = ethWalletBalances.reduce(
     (acc, wallet) =>
       acc +
       wallet.balanceByBlochain.reduce(
@@ -22,40 +21,50 @@ export const getCryptoAccountsOverview = async (userId: string) => {
     0
   );
 
-  //get erc20 balances
-  // const ethBalances = await getEthWalletBalances(userId);
+  const erc20Balances = await getErc20Balances(userId);
+  const erc20TotalBalance = erc20Balances.reduce(
+    (acc, token) => acc + token.usdValue,
+    0
+  );
 
   //get btc balances
   //get binance balance
-  return { balance };
+  return { balance: ethTotalBalance + erc20TotalBalance };
 };
 
-const getEthWalletBalances = async (userId: string) => {
+const getErc20Balances = async (userId: string) => {
   const ethWallets = await db
     .select()
     .from(ethWalletConnection)
-    .where(eq(ethWalletConnection.userId, userId));
-  // .innerJoin(
-  //   erc20TokenInWallet,
-  //   eq(ethWalletConnection.id, erc20TokenInWallet.walletId)
-  // );
-  // .innerJoin(erc20Token, eq(erc20TokenInWallet.tokenId, erc20Token.id));
+    .where(eq(ethWalletConnection.userId, userId))
+    .innerJoin(
+      erc20TokenInWallet,
+      eq(ethWalletConnection.id, erc20TokenInWallet.walletId)
+    )
+    .innerJoin(erc20Token, eq(erc20TokenInWallet.tokenId, erc20Token.id));
 
-  console.log("ethWallets", ethWallets);
-
-  //get the balance for each token address - wallet address combination
-  //get the balance using web3js
-  const web3 = BLOCKCHAINS.arbitrum.web3Provider;
-  const ethereumPrice = await getCryptoPrice(Crypto.ETH);
-
-  const balances = await Promise.all(
+  return await Promise.all(
     ethWallets.map(async (wallet) => {
-      const balance = await web3.eth.getBalance(wallet.address);
-      return Number(web3.utils.fromWei(balance, "ether")) * ethereumPrice;
+      const web3 = BLOCKCHAINS[wallet.erc20Token.blockchain].web3Provider;
+      const contract = new web3.eth.Contract(
+        ERC20_BALANCE_OF_ABI,
+        wallet.erc20Token.contractAddress
+      );
+
+      const balance = await contract.methods
+        .balanceOf(wallet.ethWalletConnection.address)
+        .call();
+
+      return {
+        blockchain: wallet.erc20Token.blockchain,
+        token: wallet.erc20Token.name,
+        address: wallet.ethWalletConnection.address,
+        usdValue:
+          (Number(balance) / 10 ** wallet.erc20Token.decimals) *
+          (await getCryptoPrice(wallet.erc20Token.cryptoId)),
+      };
     })
   );
-
-  return balances.reduce((acc, balance) => acc + balance, 0);
 };
 
 const getEthBalances = async (userId: string) => {
@@ -92,5 +101,5 @@ const getCryptoPrice = async (crypto: Crypto) => {
     `https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=usd&x_cg_demo_api_key=${process.env.COIN_GECKO_API_KEY}`
   );
 
-  return price.data.ethereum.usd;
+  return price.data[crypto].usd;
 };

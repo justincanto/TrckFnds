@@ -1,6 +1,7 @@
 import { Web3 } from "web3";
-import { BlockchainEnum, Blockchain } from "../db/schema";
+import { BlockchainEnum } from "../db/schema";
 import { RegisteredSubscription } from "web3/lib/commonjs/eth.exports";
+import { Blockchain } from "./types";
 
 export const BLOCKCHAINS: {
   [key in Blockchain]: {
@@ -8,7 +9,7 @@ export const BLOCKCHAINS: {
     web3Provider: Web3<RegisteredSubscription>;
   };
 } = {
-  [BlockchainEnum.enumValues[0]]: {
+  [Blockchain.BITCOIN]: {
     name: "Bitcoin",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -16,7 +17,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [BlockchainEnum.enumValues[1]]: {
+  [Blockchain.ETHEREUM]: {
     name: "Ethereum",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -24,7 +25,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [BlockchainEnum.enumValues[2]]: {
+  [Blockchain.POLYGON]: {
     name: "Polygon",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -32,7 +33,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [BlockchainEnum.enumValues[3]]: {
+  [Blockchain.ARBITRUM]: {
     name: "Arbitrum",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -40,7 +41,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [BlockchainEnum.enumValues[4]]: {
+  [Blockchain.OPTIMISM]: {
     name: "Optimism",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -49,3 +50,25 @@ export const BLOCKCHAINS: {
     ),
   },
 };
+
+export const ERC20_BALANCE_OF_ABI = [
+  {
+    constant: true,
+    inputs: [
+      {
+        name: "_owner",
+        type: "address",
+      },
+    ],
+    name: "balanceOf",
+    outputs: [
+      {
+        name: "balance",
+        type: "uint256",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+];
