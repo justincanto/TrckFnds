@@ -144,3 +144,14 @@ export const binanceConnection = pgTable("binanceConnection", {
   apiKey: text("apiKey").notNull(),
   secretKey: text("secretKey").notNull(),
 });
+
+export const btcWalletConnection = pgTable("btcWalletConnection", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  addresses: text("addresses").array().notNull(),
+  name: text("name").notNull(),
+});

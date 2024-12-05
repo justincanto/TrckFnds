@@ -1,5 +1,4 @@
 import { Web3 } from "web3";
-import { BlockchainEnum } from "../db/schema";
 import { RegisteredSubscription } from "web3/lib/commonjs/eth.exports";
 import { Blockchain } from "./types";
 
@@ -72,3 +71,5 @@ export const ERC20_BALANCE_OF_ABI = [
     type: "function",
   },
 ];
+
+export const SATOSHIS_PER_BITCOIN = 100000000;

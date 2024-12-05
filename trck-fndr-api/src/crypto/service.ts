@@ -2,12 +2,17 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import {
   binanceConnection,
+  btcWalletConnection,
   erc20Token,
   erc20TokenInWallet,
   ethWalletConnection,
 } from "../db/schema";
-import { BLOCKCHAINS, ERC20_BALANCE_OF_ABI } from "./constants";
-import { Crypto } from "./types";
+import {
+  BLOCKCHAINS,
+  ERC20_BALANCE_OF_ABI,
+  SATOSHIS_PER_BITCOIN,
+} from "./constants";
+import { Blockchain, Crypto } from "./types";
 import axios from "axios";
 const { Spot } = require("@binance/connector");
 const crypto = require("crypto");
@@ -30,16 +35,21 @@ export const getCryptoAccountsOverview = async (userId: string) => {
     0
   );
 
-  //get btc balances
+  const btcBalances = await getBtcBalances(userId);
+  const btcBalance = btcBalances.reduce(
+    (acc, wallet) => acc + wallet.usdValue,
+    0
+  );
 
-  //get binance balance
-  const binanceBalance = await getBinanceBalances(userId);
-  const btcBalance = binanceBalance.reduce(
+  const binanceBalances = await getBinanceBalances(userId);
+  const binanceBalance = binanceBalances.reduce(
     (acc, asset) => acc + asset.reduce((acc, asset) => acc + asset.usdValue, 0),
     0
   );
 
-  return { balance: ethTotalBalance + erc20TotalBalance + btcBalance };
+  return {
+    balance: ethTotalBalance + erc20TotalBalance + btcBalance + binanceBalance,
+  };
 };
 
 const getErc20Balances = async (userId: string) => {
@@ -69,6 +79,7 @@ const getErc20Balances = async (userId: string) => {
         blockchain: wallet.erc20Token.blockchain,
         token: wallet.erc20Token.name,
         address: wallet.ethWalletConnection.address,
+        name: wallet.ethWalletConnection.name,
         usdValue:
           (Number(balance) / 10 ** wallet.erc20Token.decimals) *
           (await getCryptoPrice(wallet.erc20Token.cryptoId)),
@@ -95,6 +106,7 @@ const getEthBalances = async (userId: string) => {
             const balance = await web3.eth.getBalance(wallet.address);
             return {
               blockchain,
+              name: wallet.name,
               amount: Number(web3.utils.fromWei(balance, "ether")),
               usdValue:
                 Number(web3.utils.fromWei(balance, "ether")) * ethereumPrice,
@@ -168,6 +180,41 @@ const getBinanceBalances = async (userId: string) => {
       ];
     })
   );
+};
+
+const getBtcBalances = async (userId: string) => {
+  const btcWallets = await db
+    .select()
+    .from(btcWalletConnection)
+    .where(eq(btcWalletConnection.userId, userId));
+
+  return await Promise.all(
+    btcWallets.map(async (wallet) => {
+      const balance = (
+        await Promise.all(
+          wallet.addresses.map(async (address) => {
+            return await getBitcoinAddressBalance(address);
+          })
+        )
+      ).reduce((acc, balance) => acc + balance, 0);
+
+      return {
+        name: wallet.name,
+        addresses: wallet.addresses,
+        amount: balance,
+        blockchain: Blockchain.BITCOIN,
+        usdValue: balance * (await getCryptoPrice(Crypto.BTC)),
+      };
+    })
+  );
+};
+
+const getBitcoinAddressBalance = async (address: string) => {
+  const balance = await axios.get(
+    `https://blockchain.info/balance?active=${address}`
+  );
+
+  return Number(balance.data[address].final_balance / SATOSHIS_PER_BITCOIN);
 };
 
 const getCryptoPrice = async (crypto: Crypto) => {
