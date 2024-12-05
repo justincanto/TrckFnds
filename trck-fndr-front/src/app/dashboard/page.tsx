@@ -1,19 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import {
-  LucideDollarSign,
-  LucideLandmark,
-  LucideTrendingDown,
-  LucideTrendingUp,
-} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartConfig } from "@/components/ui/chart";
 import BarChartRenderer from "@/components/renderer/BarChartRenderer";
 import AreaChartRenderer from "@/components/renderer/AreaChartRenderer";
 import PieChartRenderer from "@/components/renderer/PieChartRenderer";
 import ChartModule from "@/components/dashboard/ChartModule";
-import StatModule from "@/components/dashboard/StatModule";
+import { OverviewStats } from "@/components/dashboard/OverviewStats";
 
 const chartConfig = {
   desktop: {
@@ -142,40 +136,7 @@ export default function Home() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="cashflow" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <StatModule
-                  title={"Cash Flow"}
-                  value={"$12,234"}
-                  evolution={"+19% from last month"}
-                  icon={
-                    <LucideDollarSign className="h-4 w-4 text-muted-foreground" />
-                  }
-                />
-                <StatModule
-                  title={"Total Revenue"}
-                  value={"$45,231.89"}
-                  evolution={"+20.1% from last month"}
-                  icon={
-                    <LucideTrendingUp className="h-4 w-4 text-muted-foreground" />
-                  }
-                />
-                <StatModule
-                  title={"Expenses"}
-                  value={"$2,350"}
-                  evolution={"+180.1% from last month"}
-                  icon={
-                    <LucideTrendingDown className="h-4 w-4 text-muted-foreground" />
-                  }
-                />
-                <StatModule
-                  title={"Savings rate"}
-                  value={"28%"}
-                  evolution={"+1.1% from last month"}
-                  icon={
-                    <LucideLandmark className="h-4 w-4 text-muted-foreground" />
-                  }
-                />
-              </div>
+              <OverviewStats />
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <ChartModule
                   className="col-span-4"

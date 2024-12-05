@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "../ui/skeleton";
 
 const StatModule = ({
   title,
@@ -7,8 +8,8 @@ const StatModule = ({
   icon,
 }: {
   title: string;
-  value: string;
-  evolution: string;
+  value: string | null;
+  evolution: string | null;
   icon: JSX.Element;
 }) => {
   return (
@@ -18,8 +19,17 @@ const StatModule = ({
         {icon}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{evolution}</p>
+        {value ? (
+          <>
+            <div className="text-2xl font-bold">{value}</div>
+            <p className="text-xs text-muted-foreground">{evolution}</p>
+          </>
+        ) : (
+          <>
+            <Skeleton className="w-32 h-4 my-2 rounded-full" />
+            <Skeleton className="w-32 h-3 my-1 rounded-full" />
+          </>
+        )}
       </CardContent>
     </Card>
   );

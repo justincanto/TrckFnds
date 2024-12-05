@@ -1,15 +1,14 @@
 import { getBankAccountsOverview } from "../bank/service";
+import { getCryptoAccountsOverview } from "../crypto/service";
 
 export const getPortfolioOverview = async (userId: string) => {
-  //aggregate all the user's assets
-  //bank accounts
   const bankAccountsOverview = await getBankAccountsOverview(userId);
 
-  //crypto accounts
+  const cryptoAccountsOverview = await getCryptoAccountsOverview(userId);
 
-  //
-
-  return bankAccountsOverview;
+  return {
+    balance: bankAccountsOverview.balance + cryptoAccountsOverview.balance,
+  };
 };
 
 export const getPortfolioBreakdown = async (userId: string) => {};

@@ -63,21 +63,22 @@ export const getBankAccountsOverview = async (userId: string) => {
     }
   )) as { data: PowensBankAccounts };
 
-  const balance = await Object.keys(accounts.data.balances).reduce<
-    Promise<number>
-  >(async (acc, key) => {
-    if (key === Currency.USD) {
-      return (await acc) + accounts.data.balances[key]!;
-    }
+  const balance = await Object.keys(accounts.data.balances).reduce(
+    async (acc, key) => {
+      if (key === Currency.USD) {
+        return (await acc) + accounts.data.balances[key]!;
+      }
 
-    return (
-      (await acc) +
-      (await convertCurrency(
-        accounts.data.balances[key as Currency]!,
-        key as Currency
-      ))
-    );
-  }, Promise.resolve(0));
+      return (
+        (await acc) +
+        (await convertCurrency(
+          accounts.data.balances[key as Currency]!,
+          key as Currency
+        ))
+      );
+    },
+    Promise.resolve(0)
+  );
 
   return { balance };
 };
