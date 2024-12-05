@@ -11,8 +11,11 @@ export enum Crypto {
   BNB = "binancecoin",
   LINK = "chainlink",
   SOL = "solana",
-  RDNR = "render-token",
+  RENDER = "render-token",
   GRT = "the-graph",
+  AR = "arweave",
+  FET = "fetch-ai",
+  EGLD = "elrond-erd-2",
 }
 
 export enum Blockchain {

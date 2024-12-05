@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import {
+  binanceConnection,
   erc20Token,
   erc20TokenInWallet,
   ethWalletConnection,
@@ -8,6 +9,8 @@ import {
 import { BLOCKCHAINS, ERC20_BALANCE_OF_ABI } from "./constants";
 import { Crypto } from "./types";
 import axios from "axios";
+const { Spot } = require("@binance/connector");
+const crypto = require("crypto");
 
 export const getCryptoAccountsOverview = async (userId: string) => {
   const ethWalletBalances = await getEthBalances(userId);
@@ -28,8 +31,15 @@ export const getCryptoAccountsOverview = async (userId: string) => {
   );
 
   //get btc balances
+
   //get binance balance
-  return { balance: ethTotalBalance + erc20TotalBalance };
+  const binanceBalance = await getBinanceBalances(userId);
+  const btcBalance = binanceBalance.reduce(
+    (acc, asset) => acc + asset.reduce((acc, asset) => acc + asset.usdValue, 0),
+    0
+  );
+
+  return { balance: ethTotalBalance + erc20TotalBalance + btcBalance };
 };
 
 const getErc20Balances = async (userId: string) => {
@@ -92,6 +102,70 @@ const getEthBalances = async (userId: string) => {
           })
         ),
       };
+    })
+  );
+};
+
+const getBinanceBalances = async (userId: string) => {
+  const binanceConnections = await db
+    .select()
+    .from(binanceConnection)
+    .where(eq(binanceConnection.userId, userId));
+
+  return await Promise.all(
+    binanceConnections.map(async (connection) => {
+      const client = new Spot(connection.apiKey, connection.secretKey);
+      const accounts = await client.userAsset();
+
+      const assets = (
+        await Promise.all(
+          accounts.data.map(
+            async (asset: { asset: string; free: number; locked: number }) => {
+              return {
+                asset: asset.asset,
+                amount: asset.free + asset.locked,
+                usdValue:
+                  (asset.free + asset.locked) *
+                  (Crypto?.[asset.asset as keyof typeof Crypto]
+                    ? await getCryptoPrice(
+                        Crypto?.[asset.asset as keyof typeof Crypto]
+                      )
+                    : 0),
+              };
+            }
+          )
+        )
+      ).filter((asset) => asset.usdValue > 0);
+
+      const signature = crypto
+        .createHmac("sha256", connection.secretKey)
+        .update("timestamp=" + Date.now())
+        .digest("hex");
+
+      const res = await axios.get(
+        `https://api.binance.com/sapi/v1/asset/wallet/balance?timestamp=${Date.now()}&signature=${encodeURIComponent(
+          signature
+        )}`,
+        {
+          headers: {
+            "X-MBX-APIKEY": connection.apiKey,
+          },
+        }
+      );
+
+      const otherBalance =
+        res.data.reduce(
+          (acc: number, asset: { balance: string }) =>
+            acc + Number(asset.balance),
+          0
+        ) *
+          (await getCryptoPrice(Crypto.BTC)) -
+        assets.reduce((acc, asset) => acc + asset.usdValue, 0);
+
+      return [
+        ...assets,
+        { asset: "other", usdValue: otherBalance, amount: otherBalance },
+      ];
     })
   );
 };

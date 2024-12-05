@@ -20,10 +20,12 @@
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
     "@auth/express": "^0.8.4",
+    "@binance/connector": "^3.5.0",
     "@neondatabase/serverless": "^0.10.4",
     "axios": "^1.7.9",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "drizzle-orm": "^0.37.0",
     "express": "^4.21.1",
     "web3": "^4.16.0",

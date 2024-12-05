@@ -133,3 +133,14 @@ export const erc20TokenInWallet = pgTable("ethTokenInWallet", {
   walletId: text("walletId").references(() => ethWalletConnection.id),
   tokenId: text("tokenId").references(() => erc20Token.id),
 });
+
+export const binanceConnection = pgTable("binanceConnection", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  apiKey: text("apiKey").notNull(),
+  secretKey: text("secretKey").notNull(),
+});
