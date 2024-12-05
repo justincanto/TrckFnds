@@ -2,6 +2,9 @@ import axios from "axios";
 import { db } from "../db";
 import { bankConnection } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { PowensBankAccounts } from "./types";
+import { convertCurrency } from "../currency/service";
+import { Currency } from "../types/currency";
 
 export const getConnectionUrl = async (userId: string) => {
   //find the user's access token if it exists or create and store it
@@ -43,6 +46,40 @@ export const getAccounts = async (userId: string) => {
   );
 
   return accounts.data;
+};
+
+export const getBankAccountsOverview = async (userId: string) => {
+  const userBankConnection = await db
+    .select()
+    .from(bankConnection)
+    .where(eq(bankConnection.userId, userId));
+
+  const accounts = (await axios.get(
+    `${process.env.POWENS_BASE_URL}/users/me/accounts`,
+    {
+      headers: {
+        Authorization: `Bearer ${userBankConnection[0].accessToken}`,
+      },
+    }
+  )) as { data: PowensBankAccounts };
+
+  const balance = await Object.keys(accounts.data.balances).reduce<
+    Promise<number>
+  >(async (acc, key) => {
+    if (key === Currency.USD) {
+      return (await acc) + accounts.data.balances[key]!;
+    }
+
+    return (
+      (await acc) +
+      (await convertCurrency(
+        accounts.data.balances[key as Currency]!,
+        key as Currency
+      ))
+    );
+  }, Promise.resolve(0));
+
+  return { balance };
 };
 
 const createAndStoreUserAccessToken = async (userId: string) => {

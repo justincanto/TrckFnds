@@ -5,6 +5,7 @@ import {
   text,
   primaryKey,
   integer,
+  doublePrecision,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/express/adapters";
 
@@ -72,3 +73,18 @@ export const bankConnection = pgTable("bankConnection", {
     .references(() => users.id, { onDelete: "cascade" }),
   accessToken: text("accessToken").notNull(),
 });
+
+export const exchangeRate = pgTable(
+  "exchangeRate",
+  {
+    from: text("from").notNull(),
+    to: text("to").notNull(),
+    rate: doublePrecision("rate").notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+  },
+  (exchangeRate) => ({
+    pk: primaryKey({
+      columns: [exchangeRate.from, exchangeRate.to],
+    }),
+  })
+);

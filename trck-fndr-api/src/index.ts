@@ -5,6 +5,7 @@ import cors from "cors";
 import { authConfig } from "./config/auth.config";
 import bankRouter from "./bank";
 import { authenticatedUser } from "./middlewares/auth.middleware";
+import portfolioRouter from "./portfolio";
 
 const PORT = process.env.PORT;
 
@@ -23,6 +24,7 @@ app.set("trust proxy", true);
 app.use("/auth/*", ExpressAuth(authConfig));
 
 app.use("/bank", authenticatedUser, bankRouter);
+app.use("/portfolio", authenticatedUser, portfolioRouter);
 
 app
   .listen(PORT, () => {
