@@ -1,4 +1,7 @@
-import { getBankAccountsOverview } from "../bank/service";
+import {
+  getBankAccountsOverview,
+  getUserRevenuesAndExpensesByMonthWithEvolution,
+} from "../bank/service";
 import { getCryptoAccountsOverview } from "../crypto/service";
 
 export const getPortfolioOverview = async (userId: string) => {
@@ -6,8 +9,11 @@ export const getPortfolioOverview = async (userId: string) => {
 
   const cryptoAccountsOverview = await getCryptoAccountsOverview(userId);
 
+  const cashflow = await getUserRevenuesAndExpensesByMonthWithEvolution(userId);
+
   return {
     balance: bankAccountsOverview.balance + cryptoAccountsOverview.balance,
+    cashflow,
   };
 };
 

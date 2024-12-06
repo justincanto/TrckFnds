@@ -2,9 +2,10 @@ import axios from "axios";
 import { db } from "../db";
 import { bankConnection } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { PowensBankAccounts } from "./types";
+import { PowensBankAccounts, PowensTransaction } from "./types";
 import { convertCurrency } from "../currency/service";
 import { Currency } from "../types/currency";
+import dayjs from "dayjs";
 
 export const getConnectionUrl = async (userId: string) => {
   //find the user's access token if it exists or create and store it
@@ -94,4 +95,108 @@ const createAndStoreUserAccessToken = async (userId: string) => {
   await db.insert(bankConnection).values({ accessToken: auth_token, userId });
 
   return auth_token;
+};
+
+export const getUserRevenuesAndExpensesByMonthWithEvolution = async (
+  userId: string
+) => {
+  const currentMonthData = await getUserRevenuesAndExpensesByMonth(
+    userId,
+    new Date()
+  );
+  const previousMonthData = await getUserRevenuesAndExpensesByMonth(
+    userId,
+    dayjs().subtract(1, "month").toDate()
+  );
+  return {
+    expenses: {
+      current: currentMonthData.expenses,
+      evolution: currentMonthData.expenses - previousMonthData.expenses,
+      isFavorable: currentMonthData.expenses < previousMonthData.expenses,
+    },
+    revenues: {
+      current: currentMonthData.revenues,
+      evolution: currentMonthData.revenues - previousMonthData.revenues,
+      isFavorable: currentMonthData.revenues > previousMonthData.revenues,
+    },
+    savingRate: {
+      current: currentMonthData.revenues / currentMonthData.expenses,
+      evolution:
+        (currentMonthData.revenues - previousMonthData.revenues) /
+        (currentMonthData.expenses - previousMonthData.expenses),
+      isFavorable:
+        currentMonthData.revenues / currentMonthData.expenses >
+        previousMonthData.revenues / previousMonthData.expenses,
+    },
+  };
+};
+
+const getUserRevenuesAndExpensesByMonth = async (
+  userId: string,
+  date: Date
+) => {
+  const userTransations = await getUserTransactionsOfTheMonth(userId, date);
+  return extractRevenuesAndExpensesFromTransactions(
+    userTransations.transactions
+  );
+};
+
+const getUserTransactionsOfTheMonth = async (userId: string, date: Date) => {
+  const { accessToken } =
+    (
+      await db
+        .select()
+        .from(bankConnection)
+        .where(eq(bankConnection.userId, userId))
+    )?.[0] ?? {};
+
+  const powensTransactions = await axios.get(
+    `${
+      process.env.POWENS_BASE_URL
+    }/users/me/transactions?limit=1000&min_date=${dayjs(date)
+      .startOf("month")
+      .format("YYYY-MM-DD")}&max_date=${dayjs(date)
+      .endOf("month")
+      .format("YYYY-MM-DD")}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  return powensTransactions.data as {
+    total: number;
+    transactions: PowensTransaction[];
+  };
+};
+
+const extractRevenuesAndExpensesFromTransactions = (
+  transactions: PowensTransaction[]
+) => {
+  const revenuesAndExpenses = transactions.reduce(
+    (acc, transaction) => {
+      const transactionToIgnore = transactions.find(
+        (t) =>
+          t.value === -transaction.value &&
+          t.id !== transaction.id &&
+          t.wording === transaction.wording
+      );
+
+      if (transactionToIgnore) {
+        return acc;
+      }
+
+      if (transaction.value > 0) {
+        return { ...acc, revenues: acc.revenues + transaction.value };
+      }
+      return { ...acc, expenses: acc.expenses + transaction.value };
+    },
+    { revenues: 0, expenses: 0 }
+  );
+
+  return {
+    revenues: Math.round(revenuesAndExpenses.revenues),
+    expenses: -Math.round(revenuesAndExpenses.expenses),
+  };
 };
