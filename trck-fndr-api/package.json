@@ -25,6 +25,7 @@
     "axios": "^1.7.9",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "cron": "^3.2.1",
     "crypto": "^1.0.1",
     "dayjs": "^1.11.13",
     "drizzle-orm": "^0.37.0",

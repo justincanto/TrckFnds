@@ -6,6 +6,7 @@ import { authConfig } from "./config/auth.config";
 import bankRouter from "./bank";
 import { authenticatedUser } from "./middlewares/auth.middleware";
 import portfolioRouter from "./portfolio";
+import "./currency/cron";
 
 const PORT = process.env.PORT;
 
