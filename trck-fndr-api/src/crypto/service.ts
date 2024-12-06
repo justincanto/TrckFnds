@@ -127,25 +127,25 @@ const getBinanceBalances = async (userId: string) => {
   return await Promise.all(
     binanceConnections.map(async (connection) => {
       const client = new Spot(connection.apiKey, connection.secretKey);
-      const accounts = await client.userAsset();
+      const accounts = (await client.userAsset()) as {
+        data: { asset: string; free: number; locked: number }[];
+      };
 
       const assets = (
         await Promise.all(
-          accounts.data.map(
-            async (asset: { asset: string; free: number; locked: number }) => {
-              return {
-                asset: asset.asset,
-                amount: asset.free + asset.locked,
-                usdValue:
-                  (asset.free + asset.locked) *
-                  (Crypto?.[asset.asset as keyof typeof Crypto]
-                    ? await getCryptoPrice(
-                        Crypto?.[asset.asset as keyof typeof Crypto]
-                      )
-                    : 0),
-              };
-            }
-          )
+          accounts.data.map(async (asset) => {
+            return {
+              asset: asset.asset,
+              amount: asset.free + asset.locked,
+              usdValue:
+                (asset.free + asset.locked) *
+                (Crypto?.[asset.asset as keyof typeof Crypto]
+                  ? await getCryptoPrice(
+                      Crypto?.[asset.asset as keyof typeof Crypto]
+                    )
+                  : 0),
+            };
+          })
         )
       ).filter((asset) => asset.usdValue > 0);
 
