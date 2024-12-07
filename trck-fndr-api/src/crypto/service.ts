@@ -20,12 +20,7 @@ const crypto = require("crypto");
 export const getEthWalletBalances = async (userId: string) => {
   const ethWalletBalances = await getEthBalances(userId);
   const ethTotalBalance = ethWalletBalances.reduce(
-    (acc, wallet) =>
-      acc +
-      wallet.balanceByBlochain.reduce(
-        (acc, blockchain) => acc + blockchain.usdValue,
-        0
-      ),
+    (acc, wallet) => acc + wallet.usdValue,
     0
   );
 
@@ -34,6 +29,19 @@ export const getEthWalletBalances = async (userId: string) => {
     (acc, token) => acc + token.usdValue,
     0
   );
+
+  erc20Balances.forEach((token) => {
+    const wallet = ethWalletBalances.find(
+      (wallet) => wallet.address === token.address
+    );
+
+    if (!wallet) {
+      return;
+    }
+
+    wallet.usdValue += token.usdValue;
+    wallet?.tokens.push(...token.tokens);
+  });
 
   return {
     balance: ethTotalBalance + erc20TotalBalance,
@@ -64,6 +72,41 @@ export const getBinanceWalletBalances = async (userId: string) => {
   };
 };
 
+const getEthBalances = async (userId: string) => {
+  const ethWallets = await db
+    .select()
+    .from(ethWalletConnection)
+    .where(eq(ethWalletConnection.userId, userId));
+
+  const ethereumPrice = await getCryptoPrice(Crypto.ETH);
+
+  return await Promise.all(
+    ethWallets.map(async (wallet) => {
+      const tokens = await Promise.all(
+        wallet.blockchains.map(async (blockchain) => {
+          const web3 = BLOCKCHAINS[blockchain].web3Provider;
+          const balance = await web3.eth.getBalance(wallet.address);
+          const amount = Number(web3.utils.fromWei(balance, "ether"));
+
+          return {
+            blockchain: blockchain as Blockchain,
+            amount,
+            usdValue: amount * ethereumPrice,
+            token: "ETH",
+          };
+        })
+      );
+
+      return {
+        address: wallet.address,
+        name: wallet.name,
+        usdValue: tokens.reduce((acc, balance) => acc + balance.usdValue, 0),
+        tokens,
+      };
+    })
+  );
+};
+
 const getErc20Balances = async (userId: string) => {
   const ethWallets = await db
     .select()
@@ -75,7 +118,7 @@ const getErc20Balances = async (userId: string) => {
     )
     .innerJoin(erc20Token, eq(erc20TokenInWallet.tokenId, erc20Token.id));
 
-  return await Promise.all(
+  const erc20TokenBalances = await Promise.all(
     ethWallets.map(async (wallet) => {
       const web3 = BLOCKCHAINS[wallet.erc20Token.blockchain].web3Provider;
       const contract = new web3.eth.Contract(
@@ -87,44 +130,88 @@ const getErc20Balances = async (userId: string) => {
         .balanceOf(wallet.ethWalletConnection.address)
         .call();
 
+      const amount = Number(balance) / 10 ** wallet.erc20Token.decimals;
+
       return {
         blockchain: wallet.erc20Token.blockchain,
         token: wallet.erc20Token.name,
         address: wallet.ethWalletConnection.address,
         name: wallet.ethWalletConnection.name,
-        usdValue:
-          (Number(balance) / 10 ** wallet.erc20Token.decimals) *
-          (await getCryptoPrice(wallet.erc20Token.cryptoId)),
+        usdValue: amount * (await getCryptoPrice(wallet.erc20Token.cryptoId)),
+        amount,
       };
     })
   );
+
+  return erc20TokenBalances.reduce<
+    {
+      address: string;
+      name: string;
+      tokens: {
+        amount: number;
+        blockchain: Blockchain;
+        token: string;
+        usdValue: number;
+      }[];
+      usdValue: number;
+    }[]
+  >((acc, tokenBalance) => {
+    const wallet = acc.find(
+      (wallet) => wallet.address === tokenBalance.address
+    );
+
+    if (wallet) {
+      wallet.usdValue += tokenBalance.usdValue;
+      wallet.tokens.push({
+        amount: tokenBalance.amount,
+        usdValue: tokenBalance.usdValue,
+        token: tokenBalance.token,
+        blockchain: tokenBalance.blockchain as Blockchain,
+      });
+      wallet.usdValue += tokenBalance.usdValue;
+    } else {
+      acc.push({
+        address: tokenBalance.address,
+        name: tokenBalance.name,
+        tokens: [
+          {
+            amount: tokenBalance.amount,
+            usdValue: tokenBalance.usdValue,
+            token: tokenBalance.token,
+            blockchain: tokenBalance.blockchain as Blockchain,
+          },
+        ],
+        usdValue: tokenBalance.usdValue,
+      });
+    }
+
+    return acc;
+  }, []);
 };
 
-const getEthBalances = async (userId: string) => {
-  const ethWallets = await db
+const getBtcBalances = async (userId: string) => {
+  const btcWallets = await db
     .select()
-    .from(ethWalletConnection)
-    .where(eq(ethWalletConnection.userId, userId));
-
-  const ethereumPrice = await getCryptoPrice(Crypto.ETH);
+    .from(btcWalletConnection)
+    .where(eq(btcWalletConnection.userId, userId));
 
   return await Promise.all(
-    ethWallets.map(async (wallet) => {
-      return {
-        address: wallet.address,
-        balanceByBlochain: await Promise.all(
-          wallet.blockchains.map(async (blockchain) => {
-            const web3 = BLOCKCHAINS[blockchain].web3Provider;
-            const balance = await web3.eth.getBalance(wallet.address);
-            return {
-              blockchain,
-              name: wallet.name,
-              amount: Number(web3.utils.fromWei(balance, "ether")),
-              usdValue:
-                Number(web3.utils.fromWei(balance, "ether")) * ethereumPrice,
-            };
+    btcWallets.map(async (wallet) => {
+      const balance = (
+        await Promise.all(
+          wallet.addresses.map(async (address) => {
+            return await getBitcoinAddressBalance(address);
           })
-        ),
+        )
+      ).reduce((acc, balance) => acc + balance, 0);
+
+      return {
+        name: wallet.name,
+        addresses: wallet.addresses,
+        amount: balance,
+        blockchain: Blockchain.BITCOIN,
+        usdValue: balance * (await getCryptoPrice(Crypto.BTC)),
+        token: "BTC",
       };
     })
   );
@@ -147,7 +234,7 @@ const getBinanceBalances = async (userId: string) => {
         await Promise.all(
           accounts.data.map(async (asset) => {
             return {
-              asset: asset.asset,
+              token: asset.asset,
               amount: asset.free + asset.locked,
               usdValue:
                 (asset.free + asset.locked) *
@@ -190,33 +277,6 @@ const getBinanceBalances = async (userId: string) => {
         ...assets,
         { asset: "other", usdValue: otherBalance, amount: otherBalance },
       ];
-    })
-  );
-};
-
-const getBtcBalances = async (userId: string) => {
-  const btcWallets = await db
-    .select()
-    .from(btcWalletConnection)
-    .where(eq(btcWalletConnection.userId, userId));
-
-  return await Promise.all(
-    btcWallets.map(async (wallet) => {
-      const balance = (
-        await Promise.all(
-          wallet.addresses.map(async (address) => {
-            return await getBitcoinAddressBalance(address);
-          })
-        )
-      ).reduce((acc, balance) => acc + balance, 0);
-
-      return {
-        name: wallet.name,
-        addresses: wallet.addresses,
-        amount: balance,
-        blockchain: Blockchain.BITCOIN,
-        usdValue: balance * (await getCryptoPrice(Crypto.BTC)),
-      };
     })
   );
 };
