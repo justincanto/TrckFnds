@@ -55,6 +55,10 @@ export const getBankAccountsOverview = async (userId: string) => {
     .from(bankConnection)
     .where(eq(bankConnection.userId, userId));
 
+  if (userBankConnection.length === 0) {
+    return { balance: 0 };
+  }
+
   const accounts = (await axios.get(
     `${process.env.POWENS_BASE_URL}/users/me/accounts`,
     {

@@ -12,6 +12,7 @@ import type { AdapterAccountType } from "@auth/express/adapters";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { Blockchain, Crypto } from "../crypto/types";
+import { ConnectionType } from "../types/connection";
 
 export const users = pgTable("user", {
   id: text("id")
@@ -154,4 +155,22 @@ export const btcWalletConnection = pgTable("btcWalletConnection", {
     .references(() => users.id, { onDelete: "cascade" }),
   addresses: text("addresses").array().notNull(),
   name: text("name").notNull(),
+});
+
+export const ConnectionTypeEnum = pgEnum("connection_type_enum", [
+  "POWENS",
+  "ETH_WALLET",
+  "BTC_WALLET",
+  "BINANCE",
+]);
+
+export const userConnection = pgTable("userConnection", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  connectionId: text("connectionId").notNull(),
+  connectionType: ConnectionTypeEnum().$type<ConnectionType>().notNull(),
 });

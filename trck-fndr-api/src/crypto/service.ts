@@ -17,7 +17,7 @@ import axios from "axios";
 const { Spot } = require("@binance/connector");
 const crypto = require("crypto");
 
-export const getCryptoAccountsOverview = async (userId: string) => {
+export const getEthWalletBalances = async (userId: string) => {
   const ethWalletBalances = await getEthBalances(userId);
   const ethTotalBalance = ethWalletBalances.reduce(
     (acc, wallet) =>
@@ -35,12 +35,24 @@ export const getCryptoAccountsOverview = async (userId: string) => {
     0
   );
 
+  return {
+    balance: ethTotalBalance + erc20TotalBalance,
+  };
+};
+
+export const getBtcWalletBalances = async (userId: string) => {
   const btcBalances = await getBtcBalances(userId);
   const btcBalance = btcBalances.reduce(
     (acc, wallet) => acc + wallet.usdValue,
     0
   );
 
+  return {
+    balance: btcBalance,
+  };
+};
+
+export const getBinanceWalletBalances = async (userId: string) => {
   const binanceBalances = await getBinanceBalances(userId);
   const binanceBalance = binanceBalances.reduce(
     (acc, asset) => acc + asset.reduce((acc, asset) => acc + asset.usdValue, 0),
@@ -48,7 +60,7 @@ export const getCryptoAccountsOverview = async (userId: string) => {
   );
 
   return {
-    balance: ethTotalBalance + erc20TotalBalance + btcBalance + binanceBalance,
+    balance: binanceBalance,
   };
 };
 

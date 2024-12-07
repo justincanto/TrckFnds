@@ -1,18 +1,30 @@
-import {
-  getBankAccountsOverview,
-  getUserRevenuesAndExpensesByMonthWithEvolution,
-} from "../bank/service";
-import { getCryptoAccountsOverview } from "../crypto/service";
+import { eq } from "drizzle-orm";
+import { getUserRevenuesAndExpensesByMonthWithEvolution } from "../bank/service";
+import { db } from "../db";
+import { userConnection } from "../db/schema";
+import { SERVICE_BY_CONNECTION_TYPE } from "./constant";
 
 export const getPortfolioOverview = async (userId: string) => {
-  const bankAccountsOverview = await getBankAccountsOverview(userId);
+  const userConnectionTypes = await db
+    .selectDistinct({ connectionType: userConnection.connectionType })
+    .from(userConnection)
+    .where(eq(userConnection.userId, userId));
 
-  const cryptoAccountsOverview = await getCryptoAccountsOverview(userId);
+  const connections = await Promise.all(
+    userConnectionTypes.map(async (connection) => {
+      return await SERVICE_BY_CONNECTION_TYPE[connection.connectionType](
+        userId
+      );
+    })
+  );
 
   const cashflow = await getUserRevenuesAndExpensesByMonthWithEvolution(userId);
 
   return {
-    balance: bankAccountsOverview.balance + cryptoAccountsOverview.balance,
+    balance: connections.reduce(
+      (acc, connection) => acc + connection.balance,
+      0
+    ),
     cashflow,
   };
 };
