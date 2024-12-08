@@ -41,6 +41,12 @@ interface BinanceSourceDetails {
   tokens: object[];
 }
 
+export interface Asset {
+  category: string;
+  balance: number;
+  accounts: SourceAccount[];
+}
+
 export enum AssetCategory {
   CRYPTO = "CRYPTO",
   BANK_ACCOUNT = "BANK_ACCOUNT",
@@ -51,11 +57,7 @@ export enum AssetCategory {
 
 export type PortfolioData = {
   balance: number;
-  assets: {
-    category: string;
-    balance: number;
-    accounts: SourceAccount[];
-  }[];
+  assets: Asset[];
   cashflow: {
     expenses: {
       current: number;

@@ -14,6 +14,7 @@ import { signOut } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { PortfolioData } from "@/types/portfolio";
 import { formatCurrency } from "@/utils/format";
+import { AssetsAccordion } from "@/components/dashboard/AssetsAccordion";
 
 const chartConfig = {
   desktop: {
@@ -194,6 +195,7 @@ export default function Home() {
                   )}
                 </>
               </div>
+              <AssetsAccordion assets={portfolioData?.assets} />
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <ChartModule
                   className="col-span-3"
