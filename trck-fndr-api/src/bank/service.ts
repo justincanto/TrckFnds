@@ -6,6 +6,8 @@ import { PowensBankAccounts, PowensTransaction } from "./types";
 import { convertCurrency } from "../currency/service";
 import { Currency } from "../types/currency";
 import dayjs from "dayjs";
+import { AssetCategory, BankSourceDetails } from "../portfolio/types";
+import { ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE } from "./constant";
 
 export const getConnectionUrl = async (userId: string) => {
   //find the user's access token if it exists or create and store it
@@ -55,10 +57,6 @@ export const getBankAccountsOverview = async (userId: string) => {
     .from(bankConnection)
     .where(eq(bankConnection.userId, userId));
 
-  if (userBankConnection.length === 0) {
-    return { balance: 0 };
-  }
-
   const accounts = (await axios.get(
     `${process.env.POWENS_BASE_URL}/users/me/accounts`,
     {
@@ -67,6 +65,22 @@ export const getBankAccountsOverview = async (userId: string) => {
       },
     }
   )) as { data: PowensBankAccounts };
+
+  // name, usdValue, currency, amount, assetCategory
+  const details = await Promise.all(
+    accounts.data.accounts.map(async (account) => {
+      return {
+        name: account.name,
+        usdValue:
+          account.currency.id === Currency.USD
+            ? account.balance
+            : await convertCurrency(account.balance, account.currency.id),
+        currency: account.currency.id,
+        amount: account.balance,
+        assetCategory: ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE[account.type],
+      };
+    })
+  );
 
   const balance = await Object.keys(accounts.data.balances).reduce(
     async (acc, key) => {
@@ -85,7 +99,7 @@ export const getBankAccountsOverview = async (userId: string) => {
     Promise.resolve(0)
   );
 
-  return { balance };
+  return details;
 };
 
 const createAndStoreUserAccessToken = async (userId: string) => {
@@ -112,6 +126,15 @@ export const getUserRevenuesAndExpensesByMonthWithEvolution = async (
     userId,
     dayjs().subtract(1, "month").toDate()
   );
+
+  const currentSavingRate =
+    (currentMonthData.revenues - currentMonthData.expenses) /
+    currentMonthData.revenues;
+
+  const previousSavingRate =
+    (previousMonthData.revenues - previousMonthData.expenses) /
+    previousMonthData.revenues;
+
   return {
     expenses: {
       current: currentMonthData.expenses,
@@ -124,13 +147,9 @@ export const getUserRevenuesAndExpensesByMonthWithEvolution = async (
       isFavorable: currentMonthData.revenues > previousMonthData.revenues,
     },
     savingRate: {
-      current: currentMonthData.revenues / currentMonthData.expenses,
-      evolution:
-        (currentMonthData.revenues - previousMonthData.revenues) /
-        (currentMonthData.expenses - previousMonthData.expenses),
-      isFavorable:
-        currentMonthData.revenues / currentMonthData.expenses >
-        previousMonthData.revenues / previousMonthData.expenses,
+      current: currentSavingRate,
+      evolution: (currentSavingRate - previousSavingRate) / previousSavingRate,
+      isFavorable: currentSavingRate > previousSavingRate,
     },
   };
 };

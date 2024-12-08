@@ -144,6 +144,7 @@ export const binanceConnection = pgTable("binanceConnection", {
     .references(() => users.id, { onDelete: "cascade" }),
   apiKey: text("apiKey").notNull(),
   secretKey: text("secretKey").notNull(),
+  name: text("name").notNull(),
 });
 
 export const btcWalletConnection = pgTable("btcWalletConnection", {

@@ -1,6 +1,9 @@
-import { Currency } from "../types/currency";
+enum Currency {
+  EUR = "EUR",
+  USD = "USD",
+}
 
-export type SourceAccount =
+type SourceAccount =
   | EthSourceDetails
   | BtcSourceDetails
   | BankSourceDetails
@@ -23,7 +26,7 @@ interface BtcSourceDetails {
   assetCategory: AssetCategory;
 }
 
-export interface BankSourceDetails {
+interface BankSourceDetails {
   name: string;
   usdValue: number;
   currency: Currency;
@@ -45,3 +48,29 @@ export enum AssetCategory {
   STOCKS = "STOCKS",
   REAL_ESTATE = "REAL_ESTATE",
 }
+
+export type PortfolioData = {
+  balance: number;
+  assets: {
+    category: string;
+    balance: number;
+    accounts: SourceAccount[];
+  }[];
+  cashflow: {
+    expenses: {
+      current: number;
+      evolution: number;
+      isFavorable: boolean;
+    };
+    revenues: {
+      current: number;
+      evolution: number;
+      isFavorable: boolean;
+    };
+    savingRate: {
+      current: number;
+      evolution: number;
+      isFavorable: boolean;
+    };
+  };
+};

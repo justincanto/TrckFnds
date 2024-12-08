@@ -5,10 +5,10 @@ import {
   getEthWalletBalances,
 } from "../crypto/service";
 import { ConnectionType } from "../types/connection";
-import { SourceOverview } from "./types";
+import { SourceAccount } from "./types";
 
 export const SERVICE_BY_CONNECTION_TYPE: {
-  [key in ConnectionType]: (userId: string) => Promise<SourceOverview>;
+  [key in ConnectionType]: (userId: string) => Promise<SourceAccount[]>;
 } = {
   [ConnectionType.POWENS]: getBankAccountsOverview,
   [ConnectionType.ETH_WALLET]: getEthWalletBalances,

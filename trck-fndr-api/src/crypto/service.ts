@@ -14,21 +14,14 @@ import {
 } from "./constants";
 import { Blockchain, Crypto } from "./types";
 import axios from "axios";
+import { AssetCategory } from "../portfolio/types";
 const { Spot } = require("@binance/connector");
 const crypto = require("crypto");
 
 export const getEthWalletBalances = async (userId: string) => {
   const ethWalletBalances = await getEthBalances(userId);
-  const ethTotalBalance = ethWalletBalances.reduce(
-    (acc, wallet) => acc + wallet.usdValue,
-    0
-  );
 
   const erc20Balances = await getErc20Balances(userId);
-  const erc20TotalBalance = erc20Balances.reduce(
-    (acc, token) => acc + token.usdValue,
-    0
-  );
 
   erc20Balances.forEach((token) => {
     const wallet = ethWalletBalances.find(
@@ -40,36 +33,18 @@ export const getEthWalletBalances = async (userId: string) => {
     }
 
     wallet.usdValue += token.usdValue;
-    wallet?.tokens.push(...token.tokens);
+    wallet.tokens.push(...token.tokens);
   });
 
-  return {
-    balance: ethTotalBalance + erc20TotalBalance,
-  };
+  return ethWalletBalances;
 };
 
 export const getBtcWalletBalances = async (userId: string) => {
-  const btcBalances = await getBtcBalances(userId);
-  const btcBalance = btcBalances.reduce(
-    (acc, wallet) => acc + wallet.usdValue,
-    0
-  );
-
-  return {
-    balance: btcBalance,
-  };
+  return await getBtcBalances(userId);
 };
 
 export const getBinanceWalletBalances = async (userId: string) => {
-  const binanceBalances = await getBinanceBalances(userId);
-  const binanceBalance = binanceBalances.reduce(
-    (acc, asset) => acc + asset.reduce((acc, asset) => acc + asset.usdValue, 0),
-    0
-  );
-
-  return {
-    balance: binanceBalance,
-  };
+  return await getBinanceBalances(userId);
 };
 
 const getEthBalances = async (userId: string) => {
@@ -101,6 +76,7 @@ const getEthBalances = async (userId: string) => {
         address: wallet.address,
         name: wallet.name,
         usdValue: tokens.reduce((acc, balance) => acc + balance.usdValue, 0),
+        assetCategory: AssetCategory.CRYPTO,
         tokens,
       };
     })
@@ -212,6 +188,7 @@ const getBtcBalances = async (userId: string) => {
         blockchain: Blockchain.BITCOIN,
         usdValue: balance * (await getCryptoPrice(Crypto.BTC)),
         token: "BTC",
+        assetCategory: AssetCategory.CRYPTO,
       };
     })
   );
@@ -273,10 +250,16 @@ const getBinanceBalances = async (userId: string) => {
           (await getCryptoPrice(Crypto.BTC)) -
         assets.reduce((acc, asset) => acc + asset.usdValue, 0);
 
-      return [
-        ...assets,
-        { asset: "other", usdValue: otherBalance, amount: otherBalance },
-      ];
+      return {
+        name: connection.name,
+        assetCategory: AssetCategory.CRYPTO,
+        usdValue:
+          assets.reduce((acc, asset) => acc + asset.usdValue, 0) + otherBalance,
+        tokens: [
+          ...assets,
+          { token: "other", usdValue: otherBalance, amount: otherBalance },
+        ],
+      };
     })
   );
 };

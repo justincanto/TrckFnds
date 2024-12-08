@@ -7,7 +7,13 @@ import BarChartRenderer from "@/components/renderer/BarChartRenderer";
 import AreaChartRenderer from "@/components/renderer/AreaChartRenderer";
 import PieChartRenderer from "@/components/renderer/PieChartRenderer";
 import ChartModule from "@/components/dashboard/ChartModule";
+import axios from "axios";
 import { OverviewStats } from "@/components/dashboard/OverviewStats";
+import { LogOutIcon } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useEffect, useMemo, useState } from "react";
+import { PortfolioData } from "@/types/portfolio";
+import { formatCurrency } from "@/utils/format";
 
 const chartConfig = {
   desktop: {
@@ -30,37 +36,30 @@ const data = [
 ];
 
 const pieChartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
+  { browser: "chrome", visitors: 275, fill: "var(--color-1)" },
+  { browser: "safari", visitors: 200, fill: "var(--color-2)" },
+  { browser: "firefox", visitors: 287, fill: "var(--color-3)" },
+  { browser: "edge", visitors: 173, fill: "var(--color-4)" },
+  { browser: "other", visitors: 190, fill: "var(--color-5)" },
 ];
+
 const pieChartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
+  1: {
     color: "hsl(var(--chart-1))",
   },
-  safari: {
-    label: "Safari",
+  2: {
     color: "hsl(var(--chart-2))",
   },
-  firefox: {
-    label: "Firefox",
+  3: {
     color: "hsl(var(--chart-3))",
   },
-  edge: {
-    label: "Edge",
+  4: {
     color: "hsl(var(--chart-4))",
   },
-  other: {
-    label: "Other",
+  5: {
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig;
+};
 
 const subscriptionChartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -85,7 +84,32 @@ const subscriptionChartConfig = {
   },
 } satisfies ChartConfig;
 
+const getPortfolioData = async () => {
+  return axios.get("http://localhost:3001/portfolio/overview", {
+    withCredentials: true,
+  });
+};
+
 export default function Home() {
+  const [portfolioData, setPortfolioData] = useState<null | PortfolioData>(
+    null
+  );
+
+  useEffect(() => {
+    getPortfolioData().then((response) => {
+      setPortfolioData(response.data);
+    });
+  }, []);
+
+  const balanceByCategory = useMemo(() => {
+    return portfolioData?.assets.map((asset, i) => ({
+      category: asset.category,
+      balance: asset.balance,
+      formattedBalance: formatCurrency(asset.balance)!,
+      fill: `var(--color-${i + 1})`,
+    }));
+  }, [portfolioData]);
+
   return (
     <>
       <div className="md:hidden">
@@ -118,9 +142,12 @@ export default function Home() {
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-            {/* <div className="rounded-full h-5 w-5 border border-white">
-
-          </div> */}
+            <button
+              className="rounded-full p-1.5 border border-white"
+              onClick={async () => await signOut()}
+            >
+              <LogOutIcon className="w-4 h-4" />
+            </button>
           </div>
           <Tabs defaultValue="cashflow" className="space-y-4">
             <TabsList>
@@ -136,7 +163,7 @@ export default function Home() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="cashflow" className="space-y-4">
-              <OverviewStats />
+              <OverviewStats portfolioData={portfolioData} />
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <ChartModule
                   className="col-span-4"
@@ -148,16 +175,24 @@ export default function Home() {
                     chartData={data}
                   />
                 </ChartModule>
-                <ChartModule
-                  className="col-span-3"
-                  title={"Expenses Breakdown"}
-                  description={"Detailed view of expenses"}
-                >
-                  <PieChartRenderer
-                    chartConfig={pieChartConfig}
-                    chartData={pieChartData}
-                  />
-                </ChartModule>
+                <>
+                  {balanceByCategory && (
+                    <ChartModule
+                      className="col-span-3"
+                      title={"Portfolio Breakdown"}
+                      description={"Assets by category"}
+                    >
+                      <PieChartRenderer
+                        chartConfig={pieChartConfig}
+                        dataKey="balance"
+                        nameKey="category"
+                        chartData={balanceByCategory}
+                        total={portfolioData?.balance}
+                        totalLabel="Portfolio Value"
+                      />
+                    </ChartModule>
+                  )}
+                </>
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <ChartModule
@@ -166,6 +201,8 @@ export default function Home() {
                   description={"Detailed view of revenue"}
                 >
                   <PieChartRenderer
+                    dataKey="visitors"
+                    nameKey="browser"
                     chartConfig={pieChartConfig}
                     chartData={pieChartData}
                   />
@@ -185,11 +222,23 @@ export default function Home() {
                 <ChartModule
                   title={"Subscriptions"}
                   description={"Detail view of all subscriptions"}
-                  className="col-span-3"
+                  className="col-span-4"
                 >
                   <BarChartRenderer
                     chartConfig={subscriptionChartConfig}
                     chartData={subscriptionChartData}
+                  />
+                </ChartModule>
+                <ChartModule
+                  className="col-span-3"
+                  title={"Expenses Breakdown"}
+                  description={"Detailed view of expenses"}
+                >
+                  <PieChartRenderer
+                    dataKey="visitors"
+                    nameKey="browser"
+                    chartConfig={pieChartConfig}
+                    chartData={pieChartData}
                   />
                 </ChartModule>
               </div>

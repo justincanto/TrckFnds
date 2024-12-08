@@ -6,14 +6,23 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { formatCurrency } from "@/utils/format";
 import { Label, Pie, PieChart } from "recharts";
 
 const PieChartRenderer = ({
   chartConfig,
   chartData,
+  dataKey,
+  nameKey,
+  total,
+  totalLabel,
 }: {
   chartConfig: ChartConfig;
-  chartData: any;
+  chartData: { [key: string]: number | string }[];
+  dataKey: string;
+  nameKey: string;
+  total?: number;
+  totalLabel?: string;
 }) => {
   return (
     <ChartContainer
@@ -21,14 +30,11 @@ const PieChartRenderer = ({
       className="mx-auto aspect-square max-h-[28rem]"
     >
       <PieChart>
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent hideLabel />}
-        />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Pie
           data={chartData}
-          dataKey="visitors"
-          nameKey="browser"
+          dataKey={dataKey}
+          nameKey={nameKey}
           innerRadius={130}
           strokeWidth={5}
         >
@@ -47,14 +53,14 @@ const PieChartRenderer = ({
                       y={viewBox.cy}
                       className="fill-foreground text-3xl font-bold"
                     >
-                      $45,231.89
+                      {formatCurrency(total)}
                     </tspan>
                     <tspan
                       x={viewBox.cx}
                       y={(viewBox.cy || 0) + 24}
                       className="fill-muted-foreground"
                     >
-                      Visitors
+                      {totalLabel}
                     </tspan>
                   </text>
                 );
