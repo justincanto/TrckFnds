@@ -15,6 +15,7 @@ interface EthSourceDetails {
   usdValue: number;
   tokens: object[];
   assetCategory: AssetCategory;
+  logo: string;
 }
 
 interface BtcSourceDetails {
@@ -24,6 +25,7 @@ interface BtcSourceDetails {
   name: string;
   token: string;
   assetCategory: AssetCategory;
+  logo: string;
 }
 
 interface BankSourceDetails {
@@ -32,17 +34,19 @@ interface BankSourceDetails {
   currency: Currency;
   amount: number;
   assetCategory: AssetCategory;
+  logo: string;
 }
 
 interface BinanceSourceDetails {
   name: string;
   usdValue: number;
   assetCategory: AssetCategory;
+  logo: string;
   tokens: object[];
 }
 
 export interface Asset {
-  category: string;
+  category: AssetCategory;
   balance: number;
   accounts: SourceAccount[];
 }

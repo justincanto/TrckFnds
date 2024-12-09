@@ -77,6 +77,7 @@ const getEthBalances = async (userId: string) => {
         name: wallet.name,
         usdValue: tokens.reduce((acc, balance) => acc + balance.usdValue, 0),
         assetCategory: AssetCategory.CRYPTO,
+        logo: "ethereum.png",
         tokens,
       };
     })
@@ -189,6 +190,7 @@ const getBtcBalances = async (userId: string) => {
         usdValue: balance * (await getCryptoPrice(Crypto.BTC)),
         token: "BTC",
         assetCategory: AssetCategory.CRYPTO,
+        logo: "bitcoin.png",
       };
     })
   );
@@ -255,6 +257,7 @@ const getBinanceBalances = async (userId: string) => {
         assetCategory: AssetCategory.CRYPTO,
         usdValue:
           assets.reduce((acc, asset) => acc + asset.usdValue, 0) + otherBalance,
+        logo: "binance.png",
         tokens: [
           ...assets,
           { token: "other", usdValue: otherBalance, amount: otherBalance },

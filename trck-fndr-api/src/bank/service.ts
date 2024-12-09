@@ -8,6 +8,7 @@ import { Currency } from "../types/currency";
 import dayjs from "dayjs";
 import { AssetCategory, BankSourceDetails } from "../portfolio/types";
 import { ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE } from "./constant";
+import { CONNECTION_SOURCES } from "../types/sources";
 
 export const getConnectionUrl = async (userId: string) => {
   //find the user's access token if it exists or create and store it
@@ -66,7 +67,15 @@ export const getBankAccountsOverview = async (userId: string) => {
     }
   )) as { data: PowensBankAccounts };
 
-  // name, usdValue, currency, amount, assetCategory
+  const connections = (await axios.get(
+    `${process.env.POWENS_BASE_URL}/users/${accounts.data.accounts[0].id_user}/connections`,
+    {
+      headers: {
+        Authorization: `Bearer ${userBankConnection[0].accessToken}`,
+      },
+    }
+  )) as { data: { connections: { id: number; id_connector: number }[] } };
+
   const details = await Promise.all(
     accounts.data.accounts.map(async (account) => {
       return {
@@ -78,25 +87,16 @@ export const getBankAccountsOverview = async (userId: string) => {
         currency: account.currency.id,
         amount: account.balance,
         assetCategory: ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE[account.type],
+        logo:
+          CONNECTION_SOURCES.find(
+            (source) =>
+              source.id ===
+              connections.data.connections.find(
+                (connection) => connection.id === account.id_connection
+              )?.id_connector
+          )?.logo ?? "default.png",
       };
     })
-  );
-
-  const balance = await Object.keys(accounts.data.balances).reduce(
-    async (acc, key) => {
-      if (key === Currency.USD) {
-        return (await acc) + accounts.data.balances[key]!;
-      }
-
-      return (
-        (await acc) +
-        (await convertCurrency(
-          accounts.data.balances[key as Currency]!,
-          key as Currency
-        ))
-      );
-    },
-    Promise.resolve(0)
   );
 
   return details;
