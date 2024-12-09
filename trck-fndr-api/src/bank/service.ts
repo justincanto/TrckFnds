@@ -79,6 +79,7 @@ export const getBankAccountsOverview = async (userId: string) => {
   const details = await Promise.all(
     accounts.data.accounts.map(async (account) => {
       return {
+        id: `${userBankConnection[0].id}-${account.id}`,
         name: account.name,
         usdValue:
           account.currency.id === Currency.USD
@@ -87,14 +88,13 @@ export const getBankAccountsOverview = async (userId: string) => {
         currency: account.currency.id,
         amount: account.balance,
         assetCategory: ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE[account.type],
-        logo:
-          CONNECTION_SOURCES.find(
-            (source) =>
-              source.id ===
-              connections.data.connections.find(
-                (connection) => connection.id === account.id_connection
-              )?.id_connector
-          )?.logo ?? "default.png",
+        logo: CONNECTION_SOURCES.find(
+          (source) =>
+            source.id ===
+            connections.data.connections.find(
+              (connection) => connection.id === account.id_connection
+            )?.id_connector
+        )?.logo,
       };
     })
   );

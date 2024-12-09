@@ -6,20 +6,7 @@ import { SERVICE_BY_CONNECTION_TYPE } from "./constant";
 import { SourceAccount } from "./types";
 
 export const getPortfolioOverview = async (userId: string) => {
-  const userConnectionTypes = await db
-    .selectDistinct({ connectionType: userConnection.connectionType })
-    .from(userConnection)
-    .where(eq(userConnection.userId, userId));
-
-  const assets = (
-    await Promise.all(
-      userConnectionTypes.map(async (connection) => {
-        return await SERVICE_BY_CONNECTION_TYPE[connection.connectionType](
-          userId
-        );
-      })
-    )
-  ).flat();
+  const assets = await getAllUserAccounts(userId);
 
   const assetsByCategory = assets.reduce((acc, asset) => {
     const assetCategory = acc.find(
@@ -50,6 +37,23 @@ export const getPortfolioOverview = async (userId: string) => {
     cashflow,
     assets: assetsByCategory,
   };
+};
+
+export const getAllUserAccounts = async (userId: string) => {
+  const userConnectionTypes = await db
+    .selectDistinct({ connectionType: userConnection.connectionType })
+    .from(userConnection)
+    .where(eq(userConnection.userId, userId));
+
+  return (
+    await Promise.all(
+      userConnectionTypes.map(async (connection) => {
+        return await SERVICE_BY_CONNECTION_TYPE[connection.connectionType](
+          userId
+        );
+      })
+    )
+  ).flat();
 };
 
 export const getPortfolioBreakdown = async (userId: string) => {};

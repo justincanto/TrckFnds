@@ -73,6 +73,7 @@ const getEthBalances = async (userId: string) => {
       );
 
       return {
+        id: wallet.id,
         address: wallet.address,
         name: wallet.name,
         usdValue: tokens.reduce((acc, balance) => acc + balance.usdValue, 0),
@@ -183,6 +184,7 @@ const getBtcBalances = async (userId: string) => {
       ).reduce((acc, balance) => acc + balance, 0);
 
       return {
+        id: wallet.id,
         name: wallet.name,
         addresses: wallet.addresses,
         amount: balance,
@@ -253,6 +255,7 @@ const getBinanceBalances = async (userId: string) => {
         assets.reduce((acc, asset) => acc + asset.usdValue, 0);
 
       return {
+        id: connection.id,
         name: connection.name,
         assetCategory: AssetCategory.CRYPTO,
         usdValue:

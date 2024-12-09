@@ -175,3 +175,15 @@ export const userConnection = pgTable("userConnection", {
   connectionId: text("connectionId").notNull(),
   connectionType: ConnectionTypeEnum().$type<ConnectionType>().notNull(),
 });
+
+export const accountSnapshot = pgTable("accountSnapshot", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  accountId: text("accountId").notNull(),
+  balance: doublePrecision("balance").notNull(),
+  timestamp: timestamp("timestamp", { mode: "date" }).notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+});

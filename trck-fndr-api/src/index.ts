@@ -7,6 +7,7 @@ import bankRouter from "./bank";
 import { authenticatedUser } from "./middlewares/auth.middleware";
 import portfolioRouter from "./portfolio";
 import "./currency/cron";
+import "./portfolio/cron";
 
 const PORT = process.env.PORT;
 
