@@ -7,6 +7,7 @@ import BarChartRenderer from "@/components/renderer/BarChartRenderer";
 import AreaChartRenderer from "@/components/renderer/AreaChartRenderer";
 import PieChartRenderer from "@/components/renderer/PieChartRenderer";
 import ChartModule from "@/components/dashboard/ChartModule";
+import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { OverviewStats } from "@/components/dashboard/OverviewStats";
 import { LogOutIcon } from "lucide-react";
@@ -26,15 +27,6 @@ const chartConfig = {
     color: "hsl(var(--chart-5))",
   },
 } satisfies ChartConfig;
-
-const data = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
 
 const pieChartData = [
   { browser: "chrome", visitors: 275, fill: "var(--color-1)" },
@@ -91,14 +83,26 @@ const getPortfolioData = async () => {
   });
 };
 
+const getPortfolioEvolution = async () => {
+  return axios.get("http://localhost:3001/portfolio/evolution", {
+    withCredentials: true,
+  });
+};
+
 export default function Home() {
   const [portfolioData, setPortfolioData] = useState<null | PortfolioData>(
     null
   );
+  const [portfolioEvolution, setPortfolioEvolution] = useState<
+    null | { balance: number; date: string }[]
+  >(null);
 
   useEffect(() => {
     getPortfolioData().then((response) => {
       setPortfolioData(response.data);
+    });
+    getPortfolioEvolution().then((response) => {
+      setPortfolioEvolution(response.data.portfolioEvolution);
     });
   }, []);
 
@@ -150,6 +154,24 @@ export default function Home() {
               <LogOutIcon className="w-4 h-4" />
             </button>
           </div>
+          <Button
+            onClick={async () =>
+              await axios.get("http://localhost:3001/bank/connection-url", {
+                withCredentials: true,
+              })
+            }
+          >
+            Add connection
+          </Button>
+          <Button
+            onClick={async () =>
+              await axios.get("http://localhost:3001/portfolio/evolution", {
+                withCredentials: true,
+              })
+            }
+          >
+            Get evolution
+          </Button>
           <Tabs defaultValue="cashflow" className="space-y-4">
             <TabsList>
               <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
@@ -173,7 +195,9 @@ export default function Home() {
                 >
                   <AreaChartRenderer
                     chartConfig={chartConfig}
-                    chartData={data}
+                    chartData={portfolioEvolution!}
+                    dataKey="balance"
+                    axisDataKey="date"
                   />
                 </ChartModule>
                 <>
@@ -216,7 +240,9 @@ export default function Home() {
                 >
                   <AreaChartRenderer
                     chartConfig={chartConfig}
-                    chartData={data}
+                    chartData={portfolioEvolution!}
+                    dataKey="balance"
+                    axisDataKey="date"
                   />
                 </ChartModule>
               </div>
