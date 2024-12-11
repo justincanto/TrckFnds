@@ -1,7 +1,7 @@
-import express from "express";
 import { getAccounts, getConnectionUrl } from "./service";
+import { createRouter } from "../../utils/create-router";
 
-const bankRouter = express.Router();
+const bankRouter = createRouter();
 
 bankRouter.get("/connection-url", async (req, res) => {
   const { user } = res.locals.session;

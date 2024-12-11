@@ -1,7 +1,7 @@
-import { Router } from "express";
 import { getPortfolioEvolution, getPortfolioOverview } from "./service";
+import { createRouter } from "../../utils/create-router";
 
-const portfolioRouter = Router();
+const portfolioRouter = createRouter();
 
 portfolioRouter.get("/overview", async (req, res) => {
   const { user } = res.locals.session;

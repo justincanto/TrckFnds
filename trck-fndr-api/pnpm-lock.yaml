@@ -41,6 +41,9 @@ dependencies:
   express:
     specifier: ^4.21.1
     version: 4.21.1
+  express-async-errors:
+    specifier: ^3.1.1
+    version: 3.1.1(express@4.21.1)
   web3:
     specifier: ^4.16.0
     version: 4.16.0(typescript@5.7.2)(zod@3.23.8)
@@ -1391,6 +1394,14 @@ packages:
 
   /eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
+    dev: false
+
+  /express-async-errors@3.1.1(express@4.21.1):
+    resolution: {integrity: sha512-h6aK1da4tpqWSbyCa3FxB/V6Ehd4EEB15zyQq9qe75OZBp0krinNKuH4rAY+S/U/2I36vdLAUFSjQJ+TFmODng==}
+    peerDependencies:
+      express: ^4.16.2
+    dependencies:
+      express: 4.21.1
     dev: false
 
   /express@4.21.1:
