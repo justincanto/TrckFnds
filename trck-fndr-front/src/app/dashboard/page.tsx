@@ -78,15 +78,21 @@ const subscriptionChartConfig = {
 } satisfies ChartConfig;
 
 const getPortfolioData = async () => {
-  return axios.get("http://localhost:3001/portfolio/overview", {
-    withCredentials: true,
-  });
+  return axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/portfolio/overview`,
+    {
+      withCredentials: true,
+    }
+  );
 };
 
 const getPortfolioEvolution = async () => {
-  return axios.get("http://localhost:3001/portfolio/evolution", {
-    withCredentials: true,
-  });
+  return axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/portfolio/evolution`,
+    {
+      withCredentials: true,
+    }
+  );
 };
 
 export default function Home() {
@@ -156,18 +162,24 @@ export default function Home() {
           </div>
           <Button
             onClick={async () =>
-              await axios.get("http://localhost:3001/bank/connection-url", {
-                withCredentials: true,
-              })
+              await axios.get(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/bank/connection-url`,
+                {
+                  withCredentials: true,
+                }
+              )
             }
           >
             Add connection
           </Button>
           <Button
             onClick={async () =>
-              await axios.get("http://localhost:3001/portfolio/evolution", {
-                withCredentials: true,
-              })
+              await axios.get(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/portfolio/evolution`,
+                {
+                  withCredentials: true,
+                }
+              )
             }
           >
             Get evolution

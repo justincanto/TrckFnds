@@ -19,7 +19,7 @@ const BarChartRenderer = ({
   chartData,
 }: {
   chartConfig: ChartConfig;
-  chartData: any;
+  chartData: Record<string, string | number>[];
 }) => {
   return (
     <ChartContainer config={chartConfig}>
