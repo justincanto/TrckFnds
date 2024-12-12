@@ -13,7 +13,7 @@ export async function authenticatedUser(
 
   res.locals.session = session;
 
-  if (session) {
+  if (session && session.user.isSubscribed) {
     return next();
   }
 

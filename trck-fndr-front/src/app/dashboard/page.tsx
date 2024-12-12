@@ -7,7 +7,6 @@ import BarChartRenderer from "@/components/renderer/BarChartRenderer";
 import AreaChartRenderer from "@/components/renderer/AreaChartRenderer";
 import PieChartRenderer from "@/components/renderer/PieChartRenderer";
 import ChartModule from "@/components/dashboard/ChartModule";
-import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { OverviewStats } from "@/components/dashboard/OverviewStats";
 import { LogOutIcon } from "lucide-react";
@@ -95,7 +94,7 @@ const getPortfolioEvolution = async () => {
   );
 };
 
-export default function Home() {
+export default function Dashboard() {
   const [portfolioData, setPortfolioData] = useState<null | PortfolioData>(
     null
   );
@@ -140,16 +139,6 @@ export default function Home() {
         />
       </div>
       <div className="hidden flex-col md:flex">
-        {/*<div className="border-b">*/}
-        {/*  <div className="flex h-16 items-center px-4">*/}
-        {/*    <TeamSwitcher />*/}
-        {/*    <MainNav className="mx-6" />*/}
-        {/*    <div className="ml-auto flex items-center space-x-4">*/}
-        {/*      <Search />*/}
-        {/*      <UserNav />*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
@@ -160,30 +149,6 @@ export default function Home() {
               <LogOutIcon className="w-4 h-4" />
             </button>
           </div>
-          <Button
-            onClick={async () =>
-              await axios.get(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/bank/connection-url`,
-                {
-                  withCredentials: true,
-                }
-              )
-            }
-          >
-            Add connection
-          </Button>
-          <Button
-            onClick={async () =>
-              await axios.get(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/portfolio/evolution`,
-                {
-                  withCredentials: true,
-                }
-              )
-            }
-          >
-            Get evolution
-          </Button>
           <Tabs defaultValue="cashflow" className="space-y-4">
             <TabsList>
               <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>

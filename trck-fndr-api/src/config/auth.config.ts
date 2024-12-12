@@ -2,6 +2,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import Google from "@auth/express/providers/google";
 import { db } from "../db";
 import { ExpressAuthConfig } from "@auth/express";
+import { accounts, sessions, users } from "../db/schema";
 
 const useSecureCookies = process.env.NEXTAUTH_URL!.startsWith("https://");
 const cookiePrefix = useSecureCookies ? "__Secure-" : "";
@@ -9,9 +10,13 @@ const hostName = new URL(process.env.NEXTAUTH_URL!).hostname;
 
 export const authConfig: ExpressAuthConfig = {
   providers: [Google],
-  adapter: DrizzleAdapter(db),
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+  }),
   session: {
-    strategy: "jwt",
+    strategy: "database",
   },
   cookies: {
     sessionToken: {
@@ -26,8 +31,10 @@ export const authConfig: ExpressAuthConfig = {
     },
   },
   callbacks: {
-    session: async ({ session, token }) => {
-      session.user.id = token.sub!;
+    session: async ({ session, token, user }) => {
+      // @ts-ignore
+      session.user.isSubscribed = user.isSubscribed;
+      session.user.id = user.id!;
       return session;
     },
   },

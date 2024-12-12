@@ -22,6 +22,7 @@ export const users = pgTable("user", {
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
+  isSubscribed: boolean("isSubscribed").default(false).notNull(),
 });
 
 export const accounts = pgTable(
@@ -47,6 +48,14 @@ export const accounts = pgTable(
     }),
   })
 );
+
+export const sessions = pgTable("session", {
+  sessionToken: text("sessionToken").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+});
 
 export const authenticators = pgTable(
   "authenticator",

@@ -2,16 +2,30 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { db } from "./db";
+import { accounts, sessions, users } from "./db/schema";
 
 const useSecureCookies = process.env.NEXTAUTH_URL!.startsWith("https://");
 const cookiePrefix = useSecureCookies ? "__Secure-" : "";
 const hostName = new URL(process.env.NEXTAUTH_URL!).hostname;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [Google],
-  adapter: DrizzleAdapter(db),
+  providers: [
+    Google({
+      profile: (profile) => {
+        return {
+          ...profile,
+          isSubscribed: false,
+        };
+      },
+    }),
+  ],
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+  }),
   session: {
-    strategy: "jwt",
+    strategy: "database",
   },
   cookies: {
     sessionToken: {
@@ -32,10 +46,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     authorized: async ({ request, auth }) => {
-      return !!auth || !request.url.includes("dashboard");
+      // @ts-expect-error needed for drizzle adapter wrong typing
+      return auth?.user?.isSubscribed || !request.url.includes("dashboard");
     },
-    session: async ({ session, token }) => {
-      session.user.id = token.sub!;
+    session: async ({ session, token, user }) => {
+      // @ts-expect-error needed for drizzle adapter wrong typing
+      session.user.isSubscribed = user.isSubscribed;
+      session.user.id = user.id!;
       return session;
     },
   },
