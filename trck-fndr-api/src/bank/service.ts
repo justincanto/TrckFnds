@@ -1,6 +1,6 @@
 import axios from "axios";
 import { db } from "../db";
-import { bankConnection, userConnection } from "../db/schema";
+import { bankConnection, User, userConnection } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { PowensBankAccounts, PowensTransaction } from "./types";
 import { convertCurrency } from "../currency/service";
@@ -9,17 +9,18 @@ import dayjs from "dayjs";
 import { ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE } from "./constant";
 import { CONNECTION_SOURCES } from "../constants/sources";
 import { ConnectionType } from "../types/connection";
+import { setUserHasConnections } from "../user/service";
 
-export const getConnectionUrl = async (userId: string, connectorId: number) => {
+export const getConnectionUrl = async (user: User, connectorId: number) => {
   //find the user's access token if it exists or create and store it
   const userBankConnection = await db
     .select()
     .from(bankConnection)
-    .where(eq(bankConnection.userId, userId));
+    .where(eq(bankConnection.userId, user.id));
 
   const accessToken =
     userBankConnection[0]?.accessToken ||
-    (await createAndStoreUserAccessToken(userId));
+    (await createAndStoreUserAccessToken(user));
 
   //then get the temporary code
   const {
@@ -102,7 +103,7 @@ export const getBankAccountsOverview = async (userId: string) => {
   return details;
 };
 
-const createAndStoreUserAccessToken = async (userId: string) => {
+const createAndStoreUserAccessToken = async (user: User) => {
   const {
     data: { auth_token },
   } = await axios.post(`${process.env.POWENS_BASE_URL}/auth/init`, {
@@ -112,14 +113,18 @@ const createAndStoreUserAccessToken = async (userId: string) => {
 
   const [connection] = await db
     .insert(bankConnection)
-    .values({ accessToken: auth_token, userId })
+    .values({ accessToken: auth_token, userId: user.id })
     .returning({ id: bankConnection.id });
 
   await db.insert(userConnection).values({
-    userId,
+    userId: user.id,
     connectionId: connection.id,
     connectionType: ConnectionType.POWENS,
   });
+
+  if (!user.hasConnections) {
+    await setUserHasConnections(user.id, true);
+  }
 
   return auth_token;
 };

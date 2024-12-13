@@ -6,6 +6,7 @@ import {
   erc20Token,
   erc20TokenInWallet,
   ethWalletConnection,
+  User,
   userConnection,
 } from "../db/schema";
 import {
@@ -17,6 +18,7 @@ import { Blockchain, Crypto, EthereumToken, Layer1Token } from "./types";
 import axios from "axios";
 import { AssetCategory } from "../portfolio/types";
 import { ConnectionType } from "../types/connection";
+import { setUserHasConnections } from "../user/service";
 const { Spot } = require("@binance/connector");
 const crypto = require("crypto");
 
@@ -50,7 +52,7 @@ export const getBinanceWalletBalances = async (userId: string) => {
 };
 
 export const createEthereumWalletConnection = async (
-  userId: string,
+  user: User,
   name: string,
   address: string,
   blockchains: Blockchain[]
@@ -59,7 +61,7 @@ export const createEthereumWalletConnection = async (
   const [connection] = await db
     .insert(ethWalletConnection)
     .values({
-      userId,
+      userId: user.id,
       name,
       address,
       blockchains,
@@ -80,36 +82,44 @@ export const createEthereumWalletConnection = async (
   //   })
   // );
 
+  if (!user.hasConnections) {
+    await setUserHasConnections(user.id, true);
+  }
+
   return await db.insert(userConnection).values({
-    userId,
+    userId: user.id,
     connectionId: connection.id,
     connectionType: ConnectionType.ETH_WALLET,
   });
 };
 
 export const createBitcoinWalletConnection = async (
-  userId: string,
+  user: User,
   name: string,
   addresses: string[]
 ) => {
   const [connection] = await db
     .insert(btcWalletConnection)
     .values({
-      userId,
+      userId: user.id,
       name,
       addresses: addresses,
     })
     .returning({ id: ethWalletConnection.id });
 
+  if (!user.hasConnections) {
+    await setUserHasConnections(user.id, true);
+  }
+
   return await db.insert(userConnection).values({
-    userId,
+    userId: user.id,
     connectionId: connection.id,
     connectionType: ConnectionType.BTC_WALLET,
   });
 };
 
 export const createBinanceWalletConnection = async (
-  userId: string,
+  user: User,
   name: string,
   apiKey: string,
   secretKey: string
@@ -117,15 +127,19 @@ export const createBinanceWalletConnection = async (
   const [connection] = await db
     .insert(binanceConnection)
     .values({
-      userId,
+      userId: user.id,
       name,
       apiKey,
       secretKey,
     })
     .returning({ id: binanceConnection.id });
 
+  if (!user.hasConnections) {
+    await setUserHasConnections(user.id, true);
+  }
+
   return await db.insert(userConnection).values({
-    userId,
+    userId: user.id,
     connectionId: connection.id,
     connectionType: ConnectionType.BINANCE,
   });

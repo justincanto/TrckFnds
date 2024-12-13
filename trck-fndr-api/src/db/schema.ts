@@ -9,7 +9,7 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/express/adapters";
-import { sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import { Blockchain, Crypto } from "../crypto/types";
 import { ConnectionType } from "../types/connection";
 
@@ -22,7 +22,10 @@ export const users = pgTable("user", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   isSubscribed: boolean("isSubscribed").default(false).notNull(),
+  hasConnections: boolean("hasConnections").default(false).notNull(),
 });
+
+export type User = InferSelectModel<typeof users>;
 
 export const accounts = pgTable(
   "account",

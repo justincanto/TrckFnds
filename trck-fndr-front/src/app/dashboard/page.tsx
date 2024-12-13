@@ -10,7 +10,7 @@ import ChartModule from "@/components/dashboard/ChartModule";
 import axios from "axios";
 import { OverviewStats } from "@/components/dashboard/OverviewStats";
 import { LogOutIcon } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { PortfolioData } from "@/types/portfolio";
 import { formatCurrency } from "@/utils/format";
@@ -103,6 +103,8 @@ export default function Dashboard() {
     null | { balance: number; date: string }[]
   >(null);
 
+  const { data: session } = useSession();
+
   useEffect(() => {
     getPortfolioData().then((response) => {
       setPortfolioData(response.data);
@@ -150,109 +152,103 @@ export default function Dashboard() {
               <LogOutIcon className="w-4 h-4" />
             </button>
           </div>
-          <Tabs defaultValue="cashflow" className="space-y-4">
-            <div className="flex justify-between">
-              <TabsList>
-                <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
-                <TabsTrigger value="analytics" disabled>
-                  Analytics
-                </TabsTrigger>
-                <TabsTrigger value="reports" disabled>
-                  Reports
-                </TabsTrigger>
-                <TabsTrigger value="notifications" disabled>
-                  Notifications
-                </TabsTrigger>
-              </TabsList>
-              <AddConnection />
-            </div>
-            <TabsContent value="cashflow" className="space-y-4">
-              <OverviewStats portfolioData={portfolioData} />
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <ChartModule
-                  className="col-span-4"
-                  title={"Overview"}
-                  description={"Detailed view of revenue & expenses"}
-                >
-                  <AreaChartRenderer
-                    chartConfig={chartConfig}
-                    chartData={portfolioEvolution!}
-                    dataKey="balance"
-                    axisDataKey="date"
-                  />
-                </ChartModule>
-                <>
-                  {balanceByCategory && (
-                    <ChartModule
-                      className="col-span-3"
-                      title={"Portfolio Breakdown"}
-                      description={"Assets by category"}
-                    >
-                      <PieChartRenderer
-                        chartConfig={pieChartConfig}
-                        dataKey="balance"
-                        nameKey="category"
-                        chartData={balanceByCategory}
-                        total={portfolioData?.balance}
-                        totalLabel="Portfolio Value"
-                      />
-                    </ChartModule>
-                  )}
-                </>
+          {
+            //@ts-ignore
+            session?.user?.hasConnections ? (
+              <div className="space-y-4">
+                <OverviewStats portfolioData={portfolioData} />
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                  <ChartModule
+                    className="col-span-4"
+                    title={"Overview"}
+                    description={"Detailed view of revenue & expenses"}
+                  >
+                    <AreaChartRenderer
+                      chartConfig={chartConfig}
+                      chartData={portfolioEvolution!}
+                      dataKey="balance"
+                      axisDataKey="date"
+                    />
+                  </ChartModule>
+                  <>
+                    {balanceByCategory && (
+                      <ChartModule
+                        className="col-span-3"
+                        title={"Portfolio Breakdown"}
+                        description={"Assets by category"}
+                      >
+                        <PieChartRenderer
+                          chartConfig={pieChartConfig}
+                          dataKey="balance"
+                          nameKey="category"
+                          chartData={balanceByCategory}
+                          total={portfolioData?.balance}
+                          totalLabel="Portfolio Value"
+                        />
+                      </ChartModule>
+                    )}
+                  </>
+                </div>
+                <AssetsAccordion assets={portfolioData?.assets} />
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                  <ChartModule
+                    className="col-span-3"
+                    title={"Revenue Breakdown"}
+                    description={"Detailed view of revenue"}
+                  >
+                    <PieChartRenderer
+                      dataKey="visitors"
+                      nameKey="browser"
+                      chartConfig={pieChartConfig}
+                      chartData={pieChartData}
+                    />
+                  </ChartModule>
+                  <ChartModule
+                    className="col-span-4"
+                    title={"Cash Flow Breakdown"}
+                    description={"Detailed view of cash flow"}
+                  >
+                    <AreaChartRenderer
+                      chartConfig={chartConfig}
+                      chartData={portfolioEvolution!}
+                      dataKey="balance"
+                      axisDataKey="date"
+                    />
+                  </ChartModule>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                  <ChartModule
+                    title={"Subscriptions"}
+                    description={"Detail view of all subscriptions"}
+                    className="col-span-4"
+                  >
+                    <BarChartRenderer
+                      chartConfig={subscriptionChartConfig}
+                      chartData={subscriptionChartData}
+                    />
+                  </ChartModule>
+                  <ChartModule
+                    className="col-span-3"
+                    title={"Expenses Breakdown"}
+                    description={"Detailed view of expenses"}
+                  >
+                    <PieChartRenderer
+                      dataKey="visitors"
+                      nameKey="browser"
+                      chartConfig={pieChartConfig}
+                      chartData={pieChartData}
+                    />
+                  </ChartModule>
+                </div>
               </div>
-              <AssetsAccordion assets={portfolioData?.assets} />
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <ChartModule
-                  className="col-span-3"
-                  title={"Revenue Breakdown"}
-                  description={"Detailed view of revenue"}
-                >
-                  <PieChartRenderer
-                    dataKey="visitors"
-                    nameKey="browser"
-                    chartConfig={pieChartConfig}
-                    chartData={pieChartData}
-                  />
-                </ChartModule>
-                <ChartModule
-                  className="col-span-4"
-                  title={"Cash Flow Breakdown"}
-                  description={"Detailed view of cash flow"}
-                >
-                  <AreaChartRenderer
-                    chartConfig={chartConfig}
-                    chartData={portfolioEvolution!}
-                    dataKey="balance"
-                    axisDataKey="date"
-                  />
-                </ChartModule>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-y-4 min-h-[80vh]">
+                <h2>No connections yet</h2>
+                <p>Connect your first source to start tracking your assets</p>
+                <AddConnection />
               </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <ChartModule
-                  title={"Subscriptions"}
-                  description={"Detail view of all subscriptions"}
-                  className="col-span-4"
-                >
-                  <BarChartRenderer
-                    chartConfig={subscriptionChartConfig}
-                    chartData={subscriptionChartData}
-                  />
-                </ChartModule>
-                <ChartModule
-                  className="col-span-3"
-                  title={"Expenses Breakdown"}
-                  description={"Detailed view of expenses"}
-                >
-                  <PieChartRenderer
-                    dataKey="visitors"
-                    nameKey="browser"
-                    chartConfig={pieChartConfig}
-                    chartData={pieChartData}
-                  />
-                </ChartModule>
-              </div>
-            </TabsContent>
-          </Tabs>
+            )
+          }
         </div>
       </div>
     </>

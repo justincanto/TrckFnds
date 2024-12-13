@@ -9,7 +9,17 @@ const cookiePrefix = useSecureCookies ? "__Secure-" : "";
 const hostName = new URL(process.env.NEXTAUTH_URL!).hostname;
 
 export const authConfig: ExpressAuthConfig = {
-  providers: [Google],
+  providers: [
+    Google({
+      profile: (profile) => {
+        return {
+          ...profile,
+          isSubscribed: false,
+          hasConnections: false,
+        };
+      },
+    }),
+  ],
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
@@ -34,6 +44,8 @@ export const authConfig: ExpressAuthConfig = {
     session: async ({ session, token, user }) => {
       // @ts-ignore
       session.user.isSubscribed = user.isSubscribed;
+      // @ts-ignore
+      session.user.hasConnections = user.hasConnections;
       session.user.id = user.id!;
       return session;
     },

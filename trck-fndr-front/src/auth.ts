@@ -15,6 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return {
           ...profile,
           isSubscribed: false,
+          hasConnections: false,
         };
       },
     }),
@@ -50,8 +51,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return auth?.user?.isSubscribed || !request.url.includes("dashboard");
     },
     session: async ({ session, token, user }) => {
-      // @ts-expect-error needed for drizzle adapter wrong typing
+      // @ts-ignore
       session.user.isSubscribed = user.isSubscribed;
+      // @ts-ignore
+      session.user.hasConnections = user.hasConnections;
       session.user.id = user.id!;
       return session;
     },
