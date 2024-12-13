@@ -1,16 +1,16 @@
 import axios from "axios";
 import { db } from "../db";
-import { bankConnection } from "../db/schema";
+import { bankConnection, userConnection } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { PowensBankAccounts, PowensTransaction } from "./types";
 import { convertCurrency } from "../currency/service";
 import { Currency } from "../types/currency";
 import dayjs from "dayjs";
-import { AssetCategory, BankSourceDetails } from "../portfolio/types";
 import { ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE } from "./constant";
-import { CONNECTION_SOURCES } from "../types/sources";
+import { CONNECTION_SOURCES } from "../constants/sources";
+import { ConnectionType } from "../types/connection";
 
-export const getConnectionUrl = async (userId: string) => {
+export const getConnectionUrl = async (userId: string, connectorId: number) => {
   //find the user's access token if it exists or create and store it
   const userBankConnection = await db
     .select()
@@ -31,7 +31,7 @@ export const getConnectionUrl = async (userId: string) => {
   });
 
   //and return the webview url
-  return `https://webview.powens.com/connect?domain=trckfnds-sandbox.biapi.pro&client_id=${process.env.POWENS_CLIENT_ID}&redirect_uri=http://localhost:3000/bank-connection/success&code=${code}`;
+  return `https://webview.powens.com/connect?domain=trckfnds-sandbox.biapi.pro&client_id=${process.env.POWENS_CLIENT_ID}&redirect_uri=${process.env.FRONT_URL}/dashboard&code=${code}&connector_ids=${connectorId}`;
 };
 
 export const getAccounts = async (userId: string) => {
@@ -110,7 +110,16 @@ const createAndStoreUserAccessToken = async (userId: string) => {
     client_secret: process.env.POWENS_CLIENT_SECRET,
   });
 
-  await db.insert(bankConnection).values({ accessToken: auth_token, userId });
+  const [connection] = await db
+    .insert(bankConnection)
+    .values({ accessToken: auth_token, userId })
+    .returning({ id: bankConnection.id });
+
+  await db.insert(userConnection).values({
+    userId,
+    connectionId: connection.id,
+    connectionType: ConnectionType.POWENS,
+  });
 
   return auth_token;
 };

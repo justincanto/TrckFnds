@@ -4,9 +4,13 @@ import { createRouter } from "../../utils/create-router";
 const bankRouter = createRouter();
 
 bankRouter.get("/connection-url", async (req, res) => {
+  const { query } = req;
   const { user } = res.locals.session;
 
-  const connectionUrl = await getConnectionUrl(user.id);
+  const connectionUrl = await getConnectionUrl(
+    user.id,
+    Number(query.connectorId)
+  );
 
   res.send({ connectionUrl });
 });

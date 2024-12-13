@@ -6,6 +6,7 @@ import {
   erc20Token,
   erc20TokenInWallet,
   ethWalletConnection,
+  userConnection,
 } from "../db/schema";
 import {
   BLOCKCHAINS,
@@ -15,6 +16,7 @@ import {
 import { Blockchain, Crypto } from "./types";
 import axios from "axios";
 import { AssetCategory } from "../portfolio/types";
+import { ConnectionType } from "../types/connection";
 const { Spot } = require("@binance/connector");
 const crypto = require("crypto");
 
@@ -45,6 +47,71 @@ export const getBtcWalletBalances = async (userId: string) => {
 
 export const getBinanceWalletBalances = async (userId: string) => {
   return await getBinanceBalances(userId);
+};
+
+export const createEthereumWalletConnection = async (
+  userId: string,
+  name: string,
+  address: string
+) => {
+  const [connection] = await db
+    .insert(ethWalletConnection)
+    .values({
+      userId,
+      name,
+      address,
+    })
+    .returning({ id: ethWalletConnection.id });
+
+  return await db.insert(userConnection).values({
+    userId,
+    connectionId: connection.id,
+    connectionType: ConnectionType.ETH_WALLET,
+  });
+};
+
+export const createBitcoinWalletConnection = async (
+  userId: string,
+  name: string,
+  addresses: string[]
+) => {
+  const [connection] = await db
+    .insert(btcWalletConnection)
+    .values({
+      userId,
+      name,
+      addresses: addresses,
+    })
+    .returning({ id: ethWalletConnection.id });
+
+  return await db.insert(userConnection).values({
+    userId,
+    connectionId: connection.id,
+    connectionType: ConnectionType.BTC_WALLET,
+  });
+};
+
+export const createBinanceWalletConnection = async (
+  userId: string,
+  name: string,
+  apiKey: string,
+  secretKey: string
+) => {
+  const [connection] = await db
+    .insert(binanceConnection)
+    .values({
+      userId,
+      name,
+      apiKey,
+      secretKey,
+    })
+    .returning({ id: binanceConnection.id });
+
+  return await db.insert(userConnection).values({
+    userId,
+    connectionId: connection.id,
+    connectionType: ConnectionType.BINANCE,
+  });
 };
 
 const getEthBalances = async (userId: string) => {

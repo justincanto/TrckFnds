@@ -155,12 +155,12 @@ export const CONNECTION_SOURCES = [
     logo: "societe-generale.png",
   },
   {
-    name: "Ethereum",
+    name: "Ethereum Wallet",
     logo: "ethereum.png",
     popular: true,
   },
   {
-    name: "Bitcoin",
+    name: "Bitcoin Wallet",
     logo: "bitcoin.png",
     popular: true,
   },

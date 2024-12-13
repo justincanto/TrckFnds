@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PortfolioData } from "@/types/portfolio";
 import { formatCurrency } from "@/utils/format";
 import { AssetsAccordion } from "@/components/dashboard/AssetsAccordion";
+import { AddConnection } from "@/components/dashboard/add-connection/AddConnection";
 
 const chartConfig = {
   desktop: {
@@ -150,18 +151,21 @@ export default function Dashboard() {
             </button>
           </div>
           <Tabs defaultValue="cashflow" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="reports" disabled>
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value="notifications" disabled>
-                Notifications
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex justify-between">
+              <TabsList>
+                <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
+                <TabsTrigger value="analytics" disabled>
+                  Analytics
+                </TabsTrigger>
+                <TabsTrigger value="reports" disabled>
+                  Reports
+                </TabsTrigger>
+                <TabsTrigger value="notifications" disabled>
+                  Notifications
+                </TabsTrigger>
+              </TabsList>
+              <AddConnection />
+            </div>
             <TabsContent value="cashflow" className="space-y-4">
               <OverviewStats portfolioData={portfolioData} />
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

@@ -1,5 +1,10 @@
 import { getPortfolioEvolution, getPortfolioOverview } from "./service";
 import { createRouter } from "../../utils/create-router";
+import {
+  createEthereumWalletConnection,
+  createBitcoinWalletConnection,
+  createBinanceWalletConnection,
+} from "../crypto/service";
 
 const portfolioRouter = createRouter();
 
@@ -17,6 +22,49 @@ portfolioRouter.get("/evolution", async (req, res) => {
   const portfolioEvolution = await getPortfolioEvolution(user.id);
 
   res.send({ portfolioEvolution });
+});
+
+portfolioRouter.post("/connect/ethereum-wallet", async (req, res) => {
+  const { user } = res.locals.session;
+
+  const { name, address } = req.body;
+
+  const connection = await createEthereumWalletConnection(
+    user.id,
+    name,
+    address
+  );
+
+  res.send(connection);
+});
+
+portfolioRouter.post("/connect/bitcoin-wallet", async (req, res) => {
+  const { user } = res.locals.session;
+
+  const { name, addresses } = req.body;
+
+  const connection = await createBitcoinWalletConnection(
+    user.id,
+    name,
+    addresses
+  );
+
+  res.send(connection);
+});
+
+portfolioRouter.post("/connect/binance", async (req, res) => {
+  const { user } = res.locals.session;
+
+  const { name, apiKey, secretKey } = req.body;
+
+  const connection = await createBinanceWalletConnection(
+    user.id,
+    name,
+    apiKey,
+    secretKey
+  );
+
+  res.send(connection);
 });
 
 export default portfolioRouter;
