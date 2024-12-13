@@ -153,7 +153,7 @@ export default function Dashboard() {
             </button>
           </div>
           {
-            //@ts-ignore
+            //@ts-expect-error needed because of drizzle adapter wrong typing
             session?.user?.hasConnections ? (
               <div className="space-y-4">
                 <OverviewStats portfolioData={portfolioData} />

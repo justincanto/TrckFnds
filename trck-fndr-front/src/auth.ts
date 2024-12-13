@@ -47,13 +47,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     authorized: async ({ request, auth }) => {
-      // @ts-expect-error needed for drizzle adapter wrong typing
+      // @ts-expect-error needed because of drizzle adapter wrong typing
       return auth?.user?.isSubscribed || !request.url.includes("dashboard");
     },
     session: async ({ session, token, user }) => {
-      // @ts-ignore
+      // @ts-expect-error needed because of drizzle adapter wrong typing
       session.user.isSubscribed = user.isSubscribed;
-      // @ts-ignore
+      // @ts-expect-error needed because of drizzle adapter wrong typing
       session.user.hasConnections = user.hasConnections;
       session.user.id = user.id!;
       return session;
