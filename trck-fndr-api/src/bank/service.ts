@@ -127,6 +127,31 @@ const createAndStoreUserAccessToken = async (userId: string) => {
 export const getUserRevenuesAndExpensesByMonthWithEvolution = async (
   userId: string
 ) => {
+  const [userBankConnection] = await db
+    .select()
+    .from(bankConnection)
+    .where(eq(bankConnection.userId, userId));
+
+  if (!userBankConnection) {
+    return {
+      expenses: {
+        current: 0,
+        evolution: 0,
+        isFavorable: false,
+      },
+      revenues: {
+        current: 0,
+        evolution: 0,
+        isFavorable: false,
+      },
+      savingRate: {
+        current: 0,
+        evolution: 0,
+        isFavorable: false,
+      },
+    };
+  }
+
   const currentMonthData = await getUserRevenuesAndExpensesByMonth(
     userId,
     new Date()
