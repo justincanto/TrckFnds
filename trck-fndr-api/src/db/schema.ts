@@ -9,7 +9,6 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/express/adapters";
-import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { Blockchain, Crypto } from "../crypto/types";
 import { ConnectionType } from "../types/connection";

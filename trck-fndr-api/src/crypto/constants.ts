@@ -1,6 +1,6 @@
 import { Web3 } from "web3";
 import { RegisteredSubscription } from "web3/lib/commonjs/eth.exports";
-import { Blockchain } from "./types";
+import { Blockchain, EthereumBlockchain, Layer1Blockchain } from "./types";
 
 export const BLOCKCHAINS: {
   [key in Blockchain]: {
@@ -8,7 +8,7 @@ export const BLOCKCHAINS: {
     web3Provider: Web3<RegisteredSubscription>;
   };
 } = {
-  [Blockchain.BITCOIN]: {
+  [Layer1Blockchain.BITCOIN]: {
     name: "Bitcoin",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -16,7 +16,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [Blockchain.ETHEREUM]: {
+  [EthereumBlockchain.ETHEREUM]: {
     name: "Ethereum",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -24,7 +24,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [Blockchain.POLYGON]: {
+  [EthereumBlockchain.POLYGON]: {
     name: "Polygon",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -32,7 +32,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [Blockchain.ARBITRUM]: {
+  [EthereumBlockchain.ARBITRUM]: {
     name: "Arbitrum",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(
@@ -40,7 +40,7 @@ export const BLOCKCHAINS: {
       )
     ),
   },
-  [Blockchain.OPTIMISM]: {
+  [EthereumBlockchain.OPTIMISM]: {
     name: "Optimism",
     web3Provider: new Web3(
       new Web3.providers.HttpProvider(

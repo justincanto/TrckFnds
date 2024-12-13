@@ -1,3 +1,4 @@
+import { EthereumBlockchain } from "../crypto/types";
 import { Currency } from "../types/currency";
 
 export type SourceAccount =
@@ -6,12 +7,22 @@ export type SourceAccount =
   | BankSourceDetails
   | BinanceSourceDetails;
 
+interface Token {
+  amount: number;
+  usdValue: number;
+  token: string;
+}
+
+interface EthereumToken extends Token {
+  blockchain: EthereumBlockchain;
+}
+
 interface EthSourceDetails {
   id: string;
   name: string;
   address: string;
   usdValue: number;
-  tokens: object[];
+  tokens: EthereumToken[];
   assetCategory: AssetCategory;
   logo: string | undefined;
 }
@@ -43,7 +54,7 @@ interface BinanceSourceDetails {
   usdValue: number;
   assetCategory: AssetCategory;
   logo: string | undefined;
-  tokens: object[];
+  tokens: Token[];
 }
 
 export enum AssetCategory {

@@ -13,7 +13,7 @@ import {
   ERC20_BALANCE_OF_ABI,
   SATOSHIS_PER_BITCOIN,
 } from "./constants";
-import { Blockchain, Crypto } from "./types";
+import { Blockchain, Crypto, EthereumToken, Layer1Token } from "./types";
 import axios from "axios";
 import { AssetCategory } from "../portfolio/types";
 import { ConnectionType } from "../types/connection";
@@ -52,7 +52,9 @@ export const getBinanceWalletBalances = async (userId: string) => {
 export const createEthereumWalletConnection = async (
   userId: string,
   name: string,
-  address: string
+  address: string,
+  blockchains: Blockchain[]
+  // tokens: Crypto[]
 ) => {
   const [connection] = await db
     .insert(ethWalletConnection)
@@ -60,8 +62,23 @@ export const createEthereumWalletConnection = async (
       userId,
       name,
       address,
+      blockchains,
     })
     .returning({ id: ethWalletConnection.id });
+
+  // await Promise.all(
+  //   tokens.map(async (token) => {
+  //     const [t] = await db
+  //       .select()
+  //       .from(erc20Token)
+  //       .where(eq(erc20Token.cryptoId, token));
+
+  //     await db.insert(erc20TokenInWallet).values({
+  //       walletId: connection.id,
+  //       tokenId: t.id,
+  //     });
+  //   })
+  // );
 
   return await db.insert(userConnection).values({
     userId,
@@ -120,7 +137,7 @@ const getEthBalances = async (userId: string) => {
     .from(ethWalletConnection)
     .where(eq(ethWalletConnection.userId, userId));
 
-  const ethereumPrice = await getCryptoPrice(Crypto.ETH);
+  const ethereumPrice = await getCryptoPrice(EthereumToken.ETH);
 
   return await Promise.all(
     ethWallets.map(async (wallet) => {
@@ -255,8 +272,7 @@ const getBtcBalances = async (userId: string) => {
         name: wallet.name,
         addresses: wallet.addresses,
         amount: balance,
-        blockchain: Blockchain.BITCOIN,
-        usdValue: balance * (await getCryptoPrice(Crypto.BTC)),
+        usdValue: balance * (await getCryptoPrice(Layer1Token.BTC)),
         token: "BTC",
         assetCategory: AssetCategory.CRYPTO,
         logo: "bitcoin.png",
@@ -286,11 +302,7 @@ const getBinanceBalances = async (userId: string) => {
               amount: asset.free + asset.locked,
               usdValue:
                 (asset.free + asset.locked) *
-                (Crypto?.[asset.asset as keyof typeof Crypto]
-                  ? await getCryptoPrice(
-                      Crypto?.[asset.asset as keyof typeof Crypto]
-                    )
-                  : 0),
+                (await getCryptoPrice(asset.asset as Crypto)),
             };
           })
         )
@@ -318,7 +330,7 @@ const getBinanceBalances = async (userId: string) => {
             acc + Number(asset.balance),
           0
         ) *
-          (await getCryptoPrice(Crypto.BTC)) -
+          (await getCryptoPrice(Layer1Token.BTC)) -
         assets.reduce((acc, asset) => acc + asset.usdValue, 0);
 
       return {
@@ -350,5 +362,5 @@ const getCryptoPrice = async (crypto: Crypto) => {
     `https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=usd&x_cg_demo_api_key=${process.env.COIN_GECKO_API_KEY}`
   );
 
-  return price.data[crypto].usd;
+  return price.data[crypto].usd as number;
 };

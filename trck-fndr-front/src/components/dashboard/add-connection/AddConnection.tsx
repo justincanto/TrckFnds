@@ -63,16 +63,18 @@ export const AddConnection = () => {
                   connector.name
                     .toLowerCase()
                     .includes(connectorSearch.toLowerCase())
-                ).map((connector) =>
-                  React.createElement(
-                    COMPONENT_BY_CONNECTION_TYPE[connector.connectionType],
-                    {
-                      key: connector.name,
-                      connector,
-                      connectorButton: <Connector connector={connector} />,
-                    }
-                  )
-                )}
+                )
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((connector) =>
+                    React.createElement(
+                      COMPONENT_BY_CONNECTION_TYPE[connector.connectionType],
+                      {
+                        key: connector.name,
+                        connector,
+                        connectorButton: <Connector connector={connector} />,
+                      }
+                    )
+                  )}
               </div>
             </div>
           </DialogDescription>

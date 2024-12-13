@@ -1,3 +1,5 @@
+import { Blockchain } from "./crypto";
+
 enum Currency {
   EUR = "EUR",
   USD = "USD",
@@ -9,11 +11,18 @@ type SourceAccount =
   | BankSourceDetails
   | BinanceSourceDetails;
 
+interface Token {
+  amount: number;
+  usdValue: number;
+  token: string;
+  blockchain: Blockchain;
+}
+
 interface EthSourceDetails {
   name: string;
   address: string;
   usdValue: number;
-  tokens: object[];
+  tokens: Token[];
   assetCategory: AssetCategory;
   logo: string;
 }
@@ -42,7 +51,7 @@ interface BinanceSourceDetails {
   usdValue: number;
   assetCategory: AssetCategory;
   logo: string;
-  tokens: object[];
+  tokens: Token[];
 }
 
 export interface Asset {

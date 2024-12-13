@@ -27,12 +27,14 @@ portfolioRouter.get("/evolution", async (req, res) => {
 portfolioRouter.post("/connect/ethereum-wallet", async (req, res) => {
   const { user } = res.locals.session;
 
-  const { name, address } = req.body;
+  const { name, address, blockchains } = req.body;
 
   const connection = await createEthereumWalletConnection(
     user.id,
     name,
-    address
+    address,
+    blockchains
+    // tokens
   );
 
   res.send(connection);
