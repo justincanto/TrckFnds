@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "../db";
 import {
   binanceConnection,
@@ -56,7 +56,6 @@ export const createEthereumWalletConnection = async (
   name: string,
   address: string,
   blockchains: Blockchain[]
-  // tokens: Crypto[]
 ) => {
   const [connection] = await db
     .insert(ethWalletConnection)
@@ -68,19 +67,17 @@ export const createEthereumWalletConnection = async (
     })
     .returning({ id: ethWalletConnection.id });
 
-  // await Promise.all(
-  //   tokens.map(async (token) => {
-  //     const [t] = await db
-  //       .select()
-  //       .from(erc20Token)
-  //       .where(eq(erc20Token.cryptoId, token));
+  const tokens = await db
+    .select()
+    .from(erc20Token)
+    .where(inArray(erc20Token.blockchain, blockchains));
 
-  //     await db.insert(erc20TokenInWallet).values({
-  //       walletId: connection.id,
-  //       tokenId: t.id,
-  //     });
-  //   })
-  // );
+  await db.insert(erc20TokenInWallet).values(
+    tokens.map((token) => ({
+      walletId: connection.id,
+      tokenId: token.id,
+    }))
+  );
 
   if (!user.hasConnections) {
     await setUserHasConnections(user.id, true);
@@ -165,7 +162,7 @@ const getEthBalances = async (userId: string) => {
             blockchain: blockchain as Blockchain,
             amount,
             usdValue: amount * ethereumPrice,
-            token: "ETH",
+            token: EthereumToken.ETH,
           };
         })
       );
@@ -226,7 +223,7 @@ const getErc20Balances = async (userId: string) => {
       tokens: {
         amount: number;
         blockchain: Blockchain;
-        token: string;
+        token: EthereumToken;
         usdValue: number;
       }[];
       usdValue: number;
@@ -241,7 +238,7 @@ const getErc20Balances = async (userId: string) => {
       wallet.tokens.push({
         amount: tokenBalance.amount,
         usdValue: tokenBalance.usdValue,
-        token: tokenBalance.token,
+        token: tokenBalance.token as EthereumToken,
         blockchain: tokenBalance.blockchain as Blockchain,
       });
       wallet.usdValue += tokenBalance.usdValue;
@@ -253,7 +250,7 @@ const getErc20Balances = async (userId: string) => {
           {
             amount: tokenBalance.amount,
             usdValue: tokenBalance.usdValue,
-            token: tokenBalance.token,
+            token: tokenBalance.token as EthereumToken,
             blockchain: tokenBalance.blockchain as Blockchain,
           },
         ],
@@ -287,7 +284,7 @@ const getBtcBalances = async (userId: string) => {
         addresses: wallet.addresses,
         amount: balance,
         usdValue: balance * (await getCryptoPrice(Layer1Token.BTC)),
-        token: "BTC",
+        token: Layer1Token.BTC,
         assetCategory: AssetCategory.CRYPTO,
         logo: "bitcoin.png",
       };
@@ -305,7 +302,7 @@ const getBinanceBalances = async (userId: string) => {
     binanceConnections.map(async (connection) => {
       const client = new Spot(connection.apiKey, connection.secretKey);
       const accounts = (await client.userAsset()) as {
-        data: { asset: string; free: number; locked: number }[];
+        data: { asset: Crypto; free: number; locked: number }[];
       };
 
       const assets = (
@@ -356,7 +353,11 @@ const getBinanceBalances = async (userId: string) => {
         logo: "binance.png",
         tokens: [
           ...assets,
-          { token: "other", usdValue: otherBalance, amount: otherBalance },
+          {
+            token: "other" as Crypto,
+            usdValue: otherBalance,
+            amount: otherBalance,
+          },
         ],
       };
     })

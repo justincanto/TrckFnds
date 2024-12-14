@@ -35,7 +35,6 @@ portfolioRouter.post("/connect/ethereum-wallet", async (req, res) => {
     name,
     address,
     blockchains
-    // tokens
   );
 
   res.send(connection);

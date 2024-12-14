@@ -86,15 +86,6 @@ const ethereumWalletConnectionFormSchema = z.object({
       })
     )
     .min(1, { message: "At least one blockchain must be selected" }),
-  // tokens: z
-  //   .array(
-  //     z.object({
-  //       label: z.string(),
-  //       value: z.string(),
-  //       fixed: z.boolean(),
-  //     })
-  //   )
-  //   .min(1, { message: "At least one token must be selected" }),
 });
 
 export const EthereumWalletConnector = ({
@@ -110,7 +101,6 @@ export const EthereumWalletConnector = ({
       name: "",
       address: "",
       blockchains: [{ label: "Ethereum", value: EthereumBlockchain.ETHEREUM }],
-      // tokens: [{ label: "ETH", value: EthereumToken.ETH, fixed: true }],
     },
   });
 
@@ -122,7 +112,6 @@ export const EthereumWalletConnector = ({
       {
         ...data,
         blockchains: data.blockchains.map((b) => b.value),
-        // tokens: data.tokens.map((t) => t.value),
       },
       { withCredentials: true }
     );
@@ -192,34 +181,6 @@ export const EthereumWalletConnector = ({
                     </FormItem>
                   )}
                 />
-                {/* <FormField
-                  control={form.control}
-                  name="tokens"
-                  render={({ field: { value, onChange } }) => (
-                    <FormItem>
-                      <FormLabel>Tokens</FormLabel>
-                      <FormControl>
-                        <MultipleSelector
-                          defaultOptions={ETHEREUM_TOKENS}
-                          placeholder="Select Tokens you want to track"
-                          badgeClassName="rounded-full"
-                          value={value ? value : []}
-                          onChange={onChange}
-                          commandListClassName="max-h-[10rem]"
-                          emptyIndicator={
-                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                              no results found.
-                            </p>
-                          }
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        ETH balance will always be fetched.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
                 <Button type="submit" disabled={form.formState.isSubmitting}>
                   Submit
                 </Button>

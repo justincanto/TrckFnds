@@ -1,4 +1,4 @@
-import { EthereumBlockchain } from "../crypto/types";
+import { Crypto, EthereumBlockchain } from "../crypto/types";
 import { Currency } from "../types/currency";
 
 export type SourceAccount =
@@ -10,7 +10,7 @@ export type SourceAccount =
 interface Token {
   amount: number;
   usdValue: number;
-  token: string;
+  token: Crypto;
 }
 
 interface EthereumToken extends Token {

@@ -145,12 +145,15 @@ export default function Dashboard() {
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-            <button
-              className="rounded-full p-1.5 border border-white"
-              onClick={async () => await signOut()}
-            >
-              <LogOutIcon className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-x-4">
+              <AddConnection />
+              <button
+                className="rounded-full p-1.5 border border-white"
+                onClick={async () => await signOut()}
+              >
+                <LogOutIcon className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           {
             //@ts-expect-error needed because of drizzle adapter wrong typing
