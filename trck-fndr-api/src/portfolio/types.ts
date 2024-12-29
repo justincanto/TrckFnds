@@ -1,4 +1,5 @@
 import { Crypto, EthereumBlockchain } from "../crypto/types";
+import { ConnectionType } from "../types/connection";
 import { Currency } from "../types/currency";
 
 export type SourceAccount =
@@ -25,6 +26,7 @@ interface EthSourceDetails {
   tokens: EthereumToken[];
   assetCategory: AssetCategory;
   logo: string | undefined;
+  connectionType: ConnectionType;
 }
 
 interface BtcSourceDetails {
@@ -36,6 +38,7 @@ interface BtcSourceDetails {
   token: string;
   assetCategory: AssetCategory;
   logo: string | undefined;
+  connectionType: ConnectionType;
 }
 
 export interface BankSourceDetails {
@@ -46,6 +49,7 @@ export interface BankSourceDetails {
   amount: number;
   assetCategory: AssetCategory;
   logo: string | undefined;
+  connectionType: ConnectionType;
 }
 
 interface BinanceSourceDetails {
@@ -55,6 +59,7 @@ interface BinanceSourceDetails {
   assetCategory: AssetCategory;
   logo: string | undefined;
   tokens: Token[];
+  connectionType: ConnectionType;
 }
 
 export enum AssetCategory {

@@ -28,14 +28,6 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const pieChartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-1)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-2)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-3)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-4)" },
-  { browser: "other", visitors: 190, fill: "var(--color-5)" },
-];
-
 const pieChartConfig = {
   1: {
     color: "hsl(var(--chart-1))",
@@ -53,29 +45,6 @@ const pieChartConfig = {
     color: "hsl(var(--chart-5))",
   },
 };
-
-const subscriptionChartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
-
-const subscriptionChartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
-  label: {
-    color: "hsl(var(--background))",
-  },
-} satisfies ChartConfig;
 
 const getPortfolioData = async () => {
   return axios.get(
@@ -147,10 +116,7 @@ export default function Dashboard() {
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
             <div className="flex items-center gap-x-4">
               <AddConnection />
-              <button
-                className="rounded-full p-1.5 border border-white"
-                onClick={async () => await signOut()}
-              >
+              <button className="p-1.5" onClick={async () => await signOut()}>
                 <LogOutIcon className="w-4 h-4" />
               </button>
             </div>
@@ -193,56 +159,6 @@ export default function Dashboard() {
                   </>
                 </div>
                 <AssetsAccordion assets={portfolioData?.assets} />
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                  <ChartModule
-                    className="col-span-3"
-                    title={"Revenue Breakdown"}
-                    description={"Detailed view of revenue"}
-                  >
-                    <PieChartRenderer
-                      dataKey="visitors"
-                      nameKey="browser"
-                      chartConfig={pieChartConfig}
-                      chartData={pieChartData}
-                    />
-                  </ChartModule>
-                  <ChartModule
-                    className="col-span-4"
-                    title={"Cash Flow Breakdown"}
-                    description={"Detailed view of cash flow"}
-                  >
-                    <AreaChartRenderer
-                      chartConfig={chartConfig}
-                      chartData={portfolioEvolution!}
-                      dataKey="balance"
-                      axisDataKey="date"
-                    />
-                  </ChartModule>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                  <ChartModule
-                    title={"Subscriptions"}
-                    description={"Detail view of all subscriptions"}
-                    className="col-span-4"
-                  >
-                    <BarChartRenderer
-                      chartConfig={subscriptionChartConfig}
-                      chartData={subscriptionChartData}
-                    />
-                  </ChartModule>
-                  <ChartModule
-                    className="col-span-3"
-                    title={"Expenses Breakdown"}
-                    description={"Detailed view of expenses"}
-                  >
-                    <PieChartRenderer
-                      dataKey="visitors"
-                      nameKey="browser"
-                      chartConfig={pieChartConfig}
-                      chartData={pieChartData}
-                    />
-                  </ChartModule>
-                </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center gap-y-4 min-h-[80vh]">

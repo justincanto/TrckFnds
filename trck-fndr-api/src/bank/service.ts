@@ -96,6 +96,7 @@ export const getBankAccountsOverview = async (userId: string) => {
               (connection) => connection.id === account.id_connection
             )?.id_connector
         )?.logo,
+        connectionType: ConnectionType.POWENS,
       };
     })
   );

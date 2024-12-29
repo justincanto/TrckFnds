@@ -1,11 +1,12 @@
-import { Blockchain } from "./crypto";
+import { Blockchain, EthereumBlockchain } from "./crypto";
+import { ConnectionType } from "./source";
 
 enum Currency {
   EUR = "EUR",
   USD = "USD",
 }
 
-type SourceAccount =
+export type SourceAccount =
   | EthSourceDetails
   | BtcSourceDetails
   | BankSourceDetails
@@ -14,50 +15,55 @@ type SourceAccount =
 interface Token {
   amount: number;
   usdValue: number;
-  token: string;
-  blockchain: Blockchain;
+  token: Crypto;
 }
 
-interface EthSourceDetails {
+export interface EthereumToken extends Token {
+  blockchain: EthereumBlockchain;
+}
+
+export interface EthSourceDetails {
+  id: string;
   name: string;
   address: string;
   usdValue: number;
-  tokens: Token[];
+  tokens: EthereumToken[];
   assetCategory: AssetCategory;
-  logo: string;
+  logo: string | undefined;
+  connectionType: ConnectionType;
 }
 
 interface BtcSourceDetails {
+  id: string;
   addresses: string[];
   amount: number;
   usdValue: number;
   name: string;
   token: string;
   assetCategory: AssetCategory;
-  logo: string;
+  logo: string | undefined;
+  connectionType: ConnectionType;
 }
 
-interface BankSourceDetails {
+export interface BankSourceDetails {
+  id: string;
   name: string;
   usdValue: number;
   currency: Currency;
   amount: number;
   assetCategory: AssetCategory;
-  logo: string;
+  logo: string | undefined;
+  connectionType: ConnectionType;
 }
 
-interface BinanceSourceDetails {
+export interface BinanceSourceDetails {
+  id: string;
   name: string;
   usdValue: number;
   assetCategory: AssetCategory;
-  logo: string;
+  logo: string | undefined;
   tokens: Token[];
-}
-
-export interface Asset {
-  category: AssetCategory;
-  balance: number;
-  accounts: SourceAccount[];
+  connectionType: ConnectionType;
 }
 
 export enum AssetCategory {
@@ -68,6 +74,11 @@ export enum AssetCategory {
   REAL_ESTATE = "REAL_ESTATE",
 }
 
+export interface Asset {
+  category: AssetCategory;
+  balance: number;
+  accounts: SourceAccount[];
+}
 export type PortfolioData = {
   balance: number;
   assets: Asset[];

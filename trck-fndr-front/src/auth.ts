@@ -11,6 +11,7 @@ const hostName = new URL(process.env.NEXTAUTH_URL!).hostname;
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
+      allowDangerousEmailAccountLinking: true,
       profile: (profile) => {
         return {
           ...profile,

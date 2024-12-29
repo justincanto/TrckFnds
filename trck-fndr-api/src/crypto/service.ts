@@ -174,7 +174,8 @@ const getEthBalances = async (userId: string) => {
         usdValue: tokens.reduce((acc, balance) => acc + balance.usdValue, 0),
         assetCategory: AssetCategory.CRYPTO,
         logo: "ethereum.png",
-        tokens,
+        connectionType: ConnectionType.ETH_WALLET,
+        tokens: tokens.filter((token) => token.usdValue > 0),
       };
     })
   );
@@ -229,6 +230,10 @@ const getErc20Balances = async (userId: string) => {
       usdValue: number;
     }[]
   >((acc, tokenBalance) => {
+    if (tokenBalance.usdValue === 0) {
+      return acc;
+    }
+
     const wallet = acc.find(
       (wallet) => wallet.address === tokenBalance.address
     );
@@ -287,6 +292,7 @@ const getBtcBalances = async (userId: string) => {
         token: Layer1Token.BTC,
         assetCategory: AssetCategory.CRYPTO,
         logo: "bitcoin.png",
+        connectionType: ConnectionType.BTC_WALLET,
       };
     })
   );
@@ -308,12 +314,18 @@ const getBinanceBalances = async (userId: string) => {
       const assets = (
         await Promise.all(
           accounts.data.map(async (asset) => {
+            const crypto = [
+              ...Object.entries(Layer1Token),
+              ...Object.entries(EthereumToken),
+            ].find((c) => c[0] === asset.asset);
+
             return {
               token: asset.asset,
               amount: asset.free + asset.locked,
-              usdValue:
-                (asset.free + asset.locked) *
-                (await getCryptoPrice(asset.asset as Crypto)),
+              usdValue: crypto
+                ? (asset.free + asset.locked) *
+                  (await getCryptoPrice(crypto[1]))
+                : 0,
             };
           })
         )
@@ -351,6 +363,7 @@ const getBinanceBalances = async (userId: string) => {
         usdValue:
           assets.reduce((acc, asset) => acc + asset.usdValue, 0) + otherBalance,
         logo: "binance.png",
+        connectionType: ConnectionType.BINANCE,
         tokens: [
           ...assets,
           {
