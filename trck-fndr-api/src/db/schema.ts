@@ -7,6 +7,7 @@ import {
   integer,
   doublePrecision,
   pgEnum,
+  unique,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/express/adapters";
 import { InferSelectModel, sql } from "drizzle-orm";
@@ -113,21 +114,30 @@ export const BlockchainEnum = pgEnum("blockchain_enum", [
   "optimism",
 ]);
 
-export const ethWalletConnection = pgTable("ethWalletConnection", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  address: text("address").notNull(),
-  name: text("name").notNull(),
-  blockchains: BlockchainEnum()
-    .$type<Blockchain[]>()
-    .array()
-    .default(sql`'{"ethereum"}'::blockchain_enum[]`)
-    .notNull(),
-});
+export const ethWalletConnection = pgTable(
+  "ethWalletConnection",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    address: text("address").notNull(),
+    name: text("name").notNull(),
+    blockchains: BlockchainEnum()
+      .$type<Blockchain[]>()
+      .array()
+      .default(sql`'{"ethereum"}'::blockchain_enum[]`)
+      .notNull(),
+  },
+  (ethWalletConnection) => ({
+    uniqueUserAddress: unique().on(
+      ethWalletConnection.userId,
+      ethWalletConnection.address
+    ),
+  })
+);
 
 export const erc20Token = pgTable("erc20Token", {
   id: text("id")
