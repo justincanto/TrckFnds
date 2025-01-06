@@ -8,12 +8,12 @@ import { authenticatedUser } from "./middlewares/auth.middleware";
 import portfolioRouter from "./portfolio";
 import "./currency/cron";
 import "./portfolio/cron";
+import subscriptionRouter, { subscriptionWebhookRouter } from "./subscription";
 
 const PORT = process.env.PORT;
 
 const app = express();
 
-app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
@@ -23,10 +23,16 @@ app.use(
 );
 
 app.set("trust proxy", true);
+
+app.use("/", subscriptionWebhookRouter);
+
+app.use(express.json());
+
 app.use("/auth/*", ExpressAuth(authConfig));
 
 app.use("/bank", authenticatedUser, bankRouter);
 app.use("/portfolio", authenticatedUser, portfolioRouter);
+app.use("/subscription", authenticatedUser, subscriptionRouter);
 
 app
   .listen(PORT, () => {

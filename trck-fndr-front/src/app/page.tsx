@@ -1,5 +1,7 @@
+import { PricingSection } from "@/components/home/pricing";
 import { SignIn } from "@/components/trckfndr/signIn";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { ReactNode } from "react";
 
 export default function Home() {
@@ -113,6 +115,10 @@ export default function Home() {
               }
             />
           </div>
+        </section>
+
+        <section id="pricing">
+          <PricingSection />
         </section>
 
         <section className="container mx-auto px-4 py-20 text-center">

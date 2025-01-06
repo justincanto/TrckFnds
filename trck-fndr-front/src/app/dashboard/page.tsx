@@ -1,21 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartConfig } from "@/components/ui/chart";
-import BarChartRenderer from "@/components/renderer/BarChartRenderer";
 import AreaChartRenderer from "@/components/renderer/AreaChartRenderer";
 import PieChartRenderer from "@/components/renderer/PieChartRenderer";
 import ChartModule from "@/components/dashboard/ChartModule";
 import axios from "axios";
 import { OverviewStats } from "@/components/dashboard/OverviewStats";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, UserIcon } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { PortfolioData } from "@/types/portfolio";
 import { formatCurrency } from "@/utils/format";
 import { AssetsAccordion } from "@/components/dashboard/AssetsAccordion";
 import { AddConnection } from "@/components/dashboard/add-connection/AddConnection";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const chartConfig = {
   desktop: {
@@ -62,6 +70,18 @@ const getPortfolioEvolution = async () => {
       withCredentials: true,
     }
   );
+};
+
+const createPortalSession = async () => {
+  const res = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/subscription/create-portal-session`,
+    {
+      withCredentials: true,
+    }
+  );
+
+  const { sessionUrl } = res.data;
+  window.location = sessionUrl;
 };
 
 export default function Dashboard() {
@@ -116,9 +136,25 @@ export default function Dashboard() {
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
             <div className="flex items-center gap-x-4">
               <AddConnection />
-              <button className="p-1.5" onClick={async () => await signOut()}>
-                <LogOutIcon className="w-4 h-4" />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="p-1.5">
+                    <UserIcon className="w-5 h-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={createPortalSession}>
+                    Billing
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-red-600 flex justify-between"
+                    onClick={async () => await signOut()}
+                  >
+                    Logout
+                    <LogOutIcon />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
           {
