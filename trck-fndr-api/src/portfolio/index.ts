@@ -1,11 +1,9 @@
 import { getPortfolioEvolution, getPortfolioOverview } from "./service";
 import { createRouter } from "../../utils/create-router";
-import {
-  createEthereumWalletConnection,
-  createBitcoinWalletConnection,
-  createBinanceWalletConnection,
-} from "../crypto/service";
+import { createEthereumWalletConnection } from "../crypto/services/ethereum";
 import { User } from "../db/schema";
+import { createBinanceWalletConnection } from "../crypto/services/binance";
+import { createBitcoinWalletConnection } from "../crypto/services/bitcoin";
 
 const portfolioRouter = createRouter();
 

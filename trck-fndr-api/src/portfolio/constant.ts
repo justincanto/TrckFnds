@@ -1,11 +1,9 @@
 import { getBankAccountsOverview } from "../bank/service";
-import {
-  getBinanceWalletBalances,
-  getBtcWalletBalances,
-  getEthWalletBalances,
-} from "../crypto/service";
+import { getEthWalletBalances } from "../crypto/services/ethereum";
+import { getBinanceWalletBalances } from "../crypto/services/binance";
 import { ConnectionType } from "../types/connection";
 import { SourceAccount } from "./types";
+import { getBtcWalletBalances } from "../crypto/services/bitcoin";
 
 export const SERVICE_BY_CONNECTION_TYPE: {
   [key in ConnectionType]: (userId: string) => Promise<SourceAccount[]>;
