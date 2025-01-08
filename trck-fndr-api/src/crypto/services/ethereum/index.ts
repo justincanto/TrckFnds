@@ -1,38 +1,33 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "../../../db";
 import {
+  Erc20Token,
   erc20Token,
-  erc20TokenInWallet,
+  EthWalletConnection,
   ethWalletConnection,
   User,
   userConnection,
+  walletBlockchain,
 } from "../../../db/schema";
-import { BLOCKCHAINS, ERC20_BALANCE_OF_ABI } from "../../constants";
-import { Blockchain, EthereumToken } from "../../types";
-import { AssetCategory } from "../../../portfolio/types";
+import {
+  BLOCKCHAINS,
+  MULTI_CALL_ABI,
+  MULTI_CALL_ADDRESS,
+} from "../../constants";
+import { Blockchain, EthereumBlockchain } from "../../types";
+import {
+  AssetCategory,
+  EthereumTokenObject,
+  EthSourceDetails,
+} from "../../../portfolio/types";
 import { ConnectionType } from "../../../types/connection";
 import { setUserHasConnections } from "../../../user/service";
 import { getCryptoPrice } from "../../utils";
 
 export const getEthWalletBalances = async (userId: string) => {
-  const ethWalletBalances = await getEthBalances(userId);
+  const ethWallets = await getEthereumWalletBalances(userId);
 
-  const erc20Balances = await getErc20Balances(userId);
-
-  erc20Balances.forEach((token) => {
-    const wallet = ethWalletBalances.find(
-      (wallet) => wallet.address === token.address
-    );
-
-    if (!wallet) {
-      return;
-    }
-
-    wallet.usdValue += token.usdValue;
-    wallet.tokens.push(...token.tokens);
-  });
-
-  return ethWalletBalances;
+  return ethWallets;
 };
 
 export const createEthereumWalletConnection = async (
@@ -47,19 +42,13 @@ export const createEthereumWalletConnection = async (
       userId: user.id,
       name,
       address,
-      blockchains,
     })
     .returning({ id: ethWalletConnection.id });
 
-  const tokens = await db
-    .select()
-    .from(erc20Token)
-    .where(inArray(erc20Token.blockchain, blockchains));
-
-  await db.insert(erc20TokenInWallet).values(
-    tokens.map((token) => ({
+  await db.insert(walletBlockchain).values(
+    blockchains.map((blockchain) => ({
       walletId: connection.id,
-      tokenId: token.id,
+      blockchain,
     }))
   );
 
@@ -74,127 +63,158 @@ export const createEthereumWalletConnection = async (
   });
 };
 
-const getEthBalances = async (userId: string) => {
-  const ethWallets = await db
-    .select()
-    .from(ethWalletConnection)
-    .where(eq(ethWalletConnection.userId, userId));
-
-  const ethereumPrice = await getCryptoPrice(EthereumToken.ETH);
-
-  return await Promise.all(
-    ethWallets.map(async (wallet) => {
-      const tokens = await Promise.all(
-        wallet.blockchains.map(async (blockchain) => {
-          const web3 = BLOCKCHAINS[blockchain].web3Provider;
-          const balance = await web3.eth.getBalance(wallet.address);
-          const amount = Number(web3.utils.fromWei(balance, "ether"));
-
-          return {
-            blockchain: blockchain as Blockchain,
-            amount,
-            usdValue: amount * ethereumPrice,
-            token: EthereumToken.ETH,
-          };
-        })
-      );
-
-      return {
-        id: wallet.id,
-        address: wallet.address,
-        name: wallet.name,
-        usdValue: tokens.reduce((acc, balance) => acc + balance.usdValue, 0),
-        assetCategory: AssetCategory.CRYPTO,
-        logo: "ethereum.png",
-        connectionType: ConnectionType.ETH_WALLET,
-        tokens: tokens.filter((token) => token.usdValue > 0),
-      };
-    })
-  );
-};
-
-const getErc20Balances = async (userId: string) => {
-  const ethWallets = await db
+const getEthereumWalletBalances = async (userId: string) => {
+  const ethWalletTokens = await db
     .select()
     .from(ethWalletConnection)
     .where(eq(ethWalletConnection.userId, userId))
     .innerJoin(
-      erc20TokenInWallet,
-      eq(ethWalletConnection.id, erc20TokenInWallet.walletId)
+      walletBlockchain,
+      eq(ethWalletConnection.id, walletBlockchain.walletId)
     )
-    .innerJoin(erc20Token, eq(erc20TokenInWallet.tokenId, erc20Token.id));
-
-  const erc20TokenBalances = await Promise.all(
-    ethWallets.map(async (wallet) => {
-      const web3 = BLOCKCHAINS[wallet.erc20Token.blockchain].web3Provider;
-      const contract = new web3.eth.Contract(
-        ERC20_BALANCE_OF_ABI,
-        wallet.erc20Token.contractAddress
-      );
-
-      const balance = await contract.methods
-        .balanceOf(wallet.ethWalletConnection.address)
-        .call();
-
-      const amount = Number(balance) / 10 ** wallet.erc20Token.decimals;
-
-      return {
-        blockchain: wallet.erc20Token.blockchain,
-        token: wallet.erc20Token.name,
-        address: wallet.ethWalletConnection.address,
-        name: wallet.ethWalletConnection.name,
-        usdValue: amount * (await getCryptoPrice(wallet.erc20Token.cryptoId)),
-        amount,
-      };
-    })
-  );
-
-  return erc20TokenBalances.reduce<
-    {
-      address: string;
-      name: string;
-      tokens: {
-        amount: number;
-        blockchain: Blockchain;
-        token: EthereumToken;
-        usdValue: number;
-      }[];
-      usdValue: number;
-    }[]
-  >((acc, tokenBalance) => {
-    if (tokenBalance.usdValue === 0) {
-      return acc;
-    }
-
-    const wallet = acc.find(
-      (wallet) => wallet.address === tokenBalance.address
+    .innerJoin(
+      erc20Token,
+      eq(erc20Token.blockchain, walletBlockchain.blockchain)
     );
 
-    if (wallet) {
-      wallet.usdValue += tokenBalance.usdValue;
-      wallet.tokens.push({
-        amount: tokenBalance.amount,
-        usdValue: tokenBalance.usdValue,
-        token: tokenBalance.token as EthereumToken,
-        blockchain: tokenBalance.blockchain as Blockchain,
-      });
-      wallet.usdValue += tokenBalance.usdValue;
+  const multicallPayloads = createMulticallPayloads(ethWalletTokens);
+
+  const walletsBalancesByChains = await getWalletsBalancesByChains(
+    multicallPayloads
+  );
+
+  const ethereumWalletBalances = getWalletBalances(walletsBalancesByChains);
+
+  return ethereumWalletBalances;
+};
+
+const createMulticallPayloads = (
+  ethWalletTokens: {
+    ethWalletConnection: EthWalletConnection;
+    erc20Token: Erc20Token;
+  }[]
+) => {
+  return ethWalletTokens.reduce<
+    {
+      blockchain: EthereumBlockchain;
+      wallets: EthWalletConnection[];
+      tokens: Erc20Token[];
+      calls: [{ target: string; callData: string }];
+    }[]
+  >((acc, walletToken) => {
+    const { ethWalletConnection, erc20Token } = walletToken;
+    const existingPayload = acc.find(
+      (payload) => payload.blockchain === erc20Token.blockchain
+    );
+
+    const isETH = erc20Token.symbol === "ETH";
+
+    const callToAdd = {
+      target: isETH ? MULTI_CALL_ADDRESS : erc20Token.contractAddress,
+      callData: BLOCKCHAINS[
+        erc20Token.blockchain
+      ].web3Provider.eth.abi.encodeFunctionCall(
+        isETH
+          ? {
+              name: "getEthBalance",
+              type: "function",
+              inputs: [{ name: "addr", type: "address" }],
+            }
+          : {
+              name: "balanceOf",
+              type: "function",
+              inputs: [{ name: "account", type: "address" }],
+            },
+        [ethWalletConnection.address]
+      ),
+    };
+
+    if (existingPayload) {
+      existingPayload.tokens.push(erc20Token);
+      existingPayload.calls.push(callToAdd);
+      existingPayload.wallets.push(ethWalletConnection);
     } else {
       acc.push({
-        address: tokenBalance.address,
-        name: tokenBalance.name,
-        tokens: [
-          {
-            amount: tokenBalance.amount,
-            usdValue: tokenBalance.usdValue,
-            token: tokenBalance.token as EthereumToken,
-            blockchain: tokenBalance.blockchain as Blockchain,
-          },
-        ],
-        usdValue: tokenBalance.usdValue,
+        blockchain: erc20Token.blockchain as EthereumBlockchain,
+        tokens: [erc20Token],
+        wallets: [ethWalletConnection],
+        calls: [callToAdd],
       });
     }
 
     return acc;
   }, []);
+};
+
+const getWalletsBalancesByChains = async (
+  multicallPayloads: {
+    blockchain: EthereumBlockchain;
+    wallets: EthWalletConnection[];
+    tokens: Erc20Token[];
+    calls: [{ target: string; callData: string }];
+  }[]
+) => {
+  return await Promise.all(
+    multicallPayloads.map(async (multicallPayload) => {
+      const multicallContract = new BLOCKCHAINS[
+        multicallPayload.blockchain
+      ].web3Provider.eth.Contract(MULTI_CALL_ABI, MULTI_CALL_ADDRESS);
+
+      const { returnData } = (await multicallContract.methods
+        .aggregate(multicallPayload.calls)
+        .call()) as { returnData: string[] };
+
+      return {
+        wallets: multicallPayload.wallets,
+        tokens: await Promise.all(
+          returnData.map(async (data, i) => {
+            const token = multicallPayload.tokens[i];
+            const amount = Number(data) / 10 ** token.decimals;
+            return {
+              usdValue: amount * (await getCryptoPrice(token.cryptoId)),
+              amount,
+              blockchain: token.blockchain as EthereumBlockchain,
+              name: token.name,
+              token: token.cryptoId,
+            };
+          })
+        ),
+      };
+    })
+  );
+};
+
+const getWalletBalances = (
+  walletsBalancesByChains: {
+    wallets: EthWalletConnection[];
+    tokens: EthereumTokenObject[];
+  }[]
+) => {
+  return walletsBalancesByChains.reduce<EthSourceDetails[]>(
+    (acc, chainBalances) => {
+      chainBalances.wallets.forEach((wallet, i) => {
+        const existingWallet = acc.find(
+          (accWallet) => wallet.address === accWallet.address
+        );
+
+        if (existingWallet) {
+          existingWallet.usdValue += chainBalances.tokens[i].usdValue;
+          existingWallet.tokens.push(chainBalances.tokens[i]);
+        } else {
+          acc.push({
+            id: wallet.id,
+            address: wallet.address,
+            name: wallet.name,
+            usdValue: chainBalances.tokens[i].usdValue,
+            tokens: [chainBalances.tokens[i]],
+            assetCategory: AssetCategory.CRYPTO,
+            logo: "ethereum.png",
+            connectionType: ConnectionType.ETH_WALLET,
+          });
+        }
+      });
+      return acc;
+    },
+    []
+  );
 };

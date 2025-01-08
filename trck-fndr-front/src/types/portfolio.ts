@@ -15,11 +15,12 @@ export type SourceAccount =
 interface Token {
   amount: number;
   usdValue: number;
-  token: Crypto;
+  name: string;
 }
 
 export interface EthereumToken extends Token {
   blockchain: EthereumBlockchain;
+  token: Crypto;
 }
 
 export interface EthSourceDetails {

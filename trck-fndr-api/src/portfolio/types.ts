@@ -11,19 +11,22 @@ export type SourceAccount =
 interface Token {
   amount: number;
   usdValue: number;
+  name: string;
+}
+
+export type EthereumTokenObject = IEthereumToken;
+
+interface IEthereumToken extends Token {
+  blockchain: EthereumBlockchain;
   token: Crypto;
 }
 
-interface EthereumToken extends Token {
-  blockchain: EthereumBlockchain;
-}
-
-interface EthSourceDetails {
+export interface EthSourceDetails {
   id: string;
   name: string;
   address: string;
   usdValue: number;
-  tokens: EthereumToken[];
+  tokens: IEthereumToken[];
   assetCategory: AssetCategory;
   logo: string | undefined;
   connectionType: ConnectionType;

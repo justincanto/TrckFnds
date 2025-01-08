@@ -50,26 +50,28 @@ export const BLOCKCHAINS: {
   },
 };
 
-export const ERC20_BALANCE_OF_ABI = [
+export const SATOSHIS_PER_BITCOIN = 100000000;
+
+export const MULTI_CALL_ADDRESS = "0xcA11bde05977b3631167028862bE2a173976CA11";
+
+export const MULTI_CALL_ABI = [
   {
     constant: true,
     inputs: [
       {
-        name: "_owner",
-        type: "address",
+        components: [
+          { name: "target", type: "address" },
+          { name: "callData", type: "bytes" },
+        ],
+        name: "calls",
+        type: "tuple[]",
       },
     ],
-    name: "balanceOf",
+    name: "aggregate",
     outputs: [
-      {
-        name: "balance",
-        type: "uint256",
-      },
+      { name: "blockNumber", type: "uint256" },
+      { name: "returnData", type: "bytes[]" },
     ],
-    payable: false,
-    stateMutability: "view",
     type: "function",
   },
 ];
-
-export const SATOSHIS_PER_BITCOIN = 100000000;

@@ -56,19 +56,6 @@ const ETHEREUM_BLOCKCHAINS: Option[] = [
   { label: "Optimism", value: EthereumBlockchain.OPTIMISM },
 ];
 
-const ETHEREUM_TOKENS = [
-  { label: "ETH", value: EthereumToken.ETH, fixed: true },
-  { label: "USDC", value: EthereumToken.USDC },
-  { label: "USDT", value: EthereumToken.USDT },
-  { label: "DAI", value: EthereumToken.DAI },
-  { label: "POL", value: EthereumToken.POL },
-  { label: "AAVE", value: EthereumToken.AAVE },
-  { label: "LINK", value: EthereumToken.LINK },
-  { label: "GRT", value: EthereumToken.GRT },
-  { label: "FETCH", value: EthereumToken.FET },
-  { label: "RENDER", value: EthereumToken.RENDER },
-];
-
 const ethereumWalletConnectionFormSchema = z.object({
   name: z
     .string()

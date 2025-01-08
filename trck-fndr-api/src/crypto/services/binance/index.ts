@@ -3,7 +3,7 @@ import { db } from "../../../db";
 import { binanceConnection, User, userConnection } from "../../../db/schema";
 import { AssetCategory } from "../../../portfolio/types";
 import { ConnectionType } from "../../../types/connection";
-import { Crypto, EthereumToken, Layer1Token } from "../../types";
+import { EthereumToken, Layer1Token } from "../../types";
 import axios from "axios";
 import { getCryptoPrice } from "../../utils";
 import { setUserHasConnections } from "../../../user/service";
@@ -20,7 +20,7 @@ export const getBinanceWalletBalances = async (userId: string) => {
     binanceConnections.map(async (connection) => {
       const client = new Spot(connection.apiKey, connection.secretKey);
       const accounts = (await client.userAsset()) as {
-        data: { asset: Crypto; free: number; locked: number }[];
+        data: { asset: string; free: number; locked: number }[];
       };
 
       const assets = (
@@ -32,7 +32,7 @@ export const getBinanceWalletBalances = async (userId: string) => {
             ].find((c) => c[0] === asset.asset);
 
             return {
-              token: asset.asset,
+              name: asset.asset,
               amount: asset.free + asset.locked,
               usdValue: crypto
                 ? (asset.free + asset.locked) *
@@ -79,7 +79,7 @@ export const getBinanceWalletBalances = async (userId: string) => {
         tokens: [
           ...assets,
           {
-            token: "other" as Crypto,
+            name: "Other",
             usdValue: otherBalance,
             amount: otherBalance,
           },

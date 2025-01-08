@@ -77,11 +77,11 @@ export const AssetsAccordion = ({
                                 : "";
                             return (
                               <div
-                                key={token.token + blockchain}
+                                key={token.name + blockchain}
                                 className="flex justify-between mr-8 py-1.5 items-center"
                               >
                                 <p>
-                                  {String(token.token)}
+                                  {(token as EthereumToken).name}
                                   {blockchain}
                                 </p>
                                 <p>{formatCurrency(token.usdValue)}</p>
