@@ -8,7 +8,12 @@ import {
 } from "lucide-react";
 import StatModule from "./StatModule";
 import { PortfolioData } from "@/types/portfolio";
-import { formatCurrency, formatPercentage } from "@/utils/format";
+import {
+  formatCurrency,
+  formatPercentage,
+  formatEvolutionCurrency,
+  formatEvolutionPercentage,
+} from "@/utils/format";
 
 export const OverviewStats = ({
   portfolioData,
@@ -20,25 +25,34 @@ export const OverviewStats = ({
       <StatModule
         title={"Portfolio Value"}
         value={formatCurrency(portfolioData?.balance)}
-        evolution={"+19% from last month"}
+        label={"+19% from last month"}
         icon={<LucideDollarSign className="h-4 w-4 text-muted-foreground" />}
       />
       <StatModule
         title={"Total Revenue"}
         value={formatCurrency(portfolioData?.cashflow.revenues.current)}
-        evolution={"+20.1% from last month"}
+        label={`${formatEvolutionCurrency(
+          portfolioData?.cashflow.revenues.evolution
+        )} from last month`}
+        isFavorableLabel={portfolioData?.cashflow.revenues.isFavorable}
         icon={<LucideTrendingUp className="h-4 w-4 text-muted-foreground" />}
       />
       <StatModule
         title={"Expenses"}
         value={formatCurrency(portfolioData?.cashflow.expenses.current)}
-        evolution={"+180.1% from last month"}
+        label={`${formatEvolutionCurrency(
+          portfolioData?.cashflow.expenses.evolution
+        )} from last month`}
+        isFavorableLabel={portfolioData?.cashflow.expenses.isFavorable}
         icon={<LucideTrendingDown className="h-4 w-4 text-muted-foreground" />}
       />
       <StatModule
         title={"Savings rate"}
         value={formatPercentage(portfolioData?.cashflow.savingRate.current)}
-        evolution={"+1.1% from last month"}
+        label={`${formatEvolutionPercentage(
+          portfolioData?.cashflow.savingRate.evolution
+        )} from last month`}
+        isFavorableLabel={portfolioData?.cashflow.savingRate.isFavorable}
         icon={<LucideLandmark className="h-4 w-4 text-muted-foreground" />}
       />
     </div>
