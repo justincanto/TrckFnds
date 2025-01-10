@@ -17,7 +17,7 @@ export const SignIn = () => {
           })
         }
         variant="outline"
-        className="border-gray-100 bg-transparent"
+        className="border border-emerald-50 bg-transparent"
       >
         Sign In
       </Button>

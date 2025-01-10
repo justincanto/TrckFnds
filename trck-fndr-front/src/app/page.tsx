@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-orange-50">
+    <div className="min-h-screen bg-neutral-950 text-emerald-50">
       <header className="container mx-auto px-4 py-6 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <ChartColumnIncreasingIcon className="w-6 h-6" />
@@ -23,23 +23,26 @@ export default function Home() {
             <br />
             Grow your portfolio.
           </h1>
-          <p className="text-lg text-orange-50/80 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-emerald-50/80 mb-10 max-w-2xl mx-auto">
             Effortlessly track, manage, and optimize your assets and budget.
           </p>
-          <Button size="lg" className="mr-4 bg-orange-400 hover:bg-orange-500">
+          <Button
+            size="lg"
+            className="mr-4 bg-emerald-400 hover:bg-emerald-500"
+          >
             Get Started
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="border-orange-50 bg-transparent text-orange-50"
+            className="border-emerald-50 bg-transparent text-emerald-50"
           >
             Learn More
           </Button>
         </section>
 
         <section>
-          <div className="w-10/12 mx-auto rounded-xl p-3 bg-orange-50">
+          <div className="w-10/12 mx-auto rounded-xl p-3 bg-emerald-50">
             <Image
               src={`/images/home/app-screenshot.png`}
               alt="App screenshot"
@@ -58,7 +61,7 @@ export default function Home() {
               description="Automatically import and categorize your transactions for effortless financial management."
               icon={
                 <svg
-                  className="w-12 h-12 text-orange-400"
+                  className="w-12 h-12 text-emerald-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -78,7 +81,7 @@ export default function Home() {
               description="Gain valuable insights into your spending habits with our powerful analytics tools."
               icon={
                 <svg
-                  className="w-12 h-12 text-orange-400"
+                  className="w-12 h-12 text-emerald-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -98,7 +101,7 @@ export default function Home() {
               description="Your financial data is protected with bank-level security and encryption."
               icon={
                 <svg
-                  className="w-12 h-12 text-orange-400"
+                  className="w-12 h-12 text-emerald-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -124,17 +127,17 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-6">
             Ready to Take Control of Your Finances?
           </h2>
-          <p className="text-lg text-orange-50/80 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-emerald-50/80 mb-10 max-w-2xl mx-auto">
             Join thousands of users who have simplified their financial
             management with TrckFnds.
           </p>
-          <Button size="lg" className="bg-orange-400 hover:bg-orange-500">
+          <Button size="lg" className="bg-emerald-400 hover:bg-emerald-500">
             Create an account
           </Button>
         </section>
       </main>
 
-      <footer className="container mx-auto px-4 py-8 text-center text-orange-50/60 border-t border-gray-800">
+      <footer className="container mx-auto px-4 py-8 text-center text-emerald-50/60 border-t border-gray-800">
         <p>&copy; 2025 TrckFnds. All rights reserved.</p>
       </footer>
     </div>
@@ -154,7 +157,7 @@ function FeatureSection({
     <div className="text-center">
       <div className="flex justify-center mb-4">{icon}</div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-orange-50/80">{description}</p>
+      <p className="text-emerald-50/80">{description}</p>
     </div>
   );
 }
