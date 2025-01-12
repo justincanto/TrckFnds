@@ -33,10 +33,10 @@ const PRICING_PLANS_ID = {
 };
 
 const includedFeatures = [
-  "Private forum access",
-  "Member resources",
-  "Entry to annual conference",
-  "Official member t-shirt",
+  "Asset aggregation",
+  "Portfolio breakdown",
+  "Net worth evolution",
+  "Cashflow analysis",
 ];
 
 export const PricingSection = () => {
@@ -143,14 +143,14 @@ export const PricingSection = () => {
                 </p>
                 {data?.user?.id ? (
                   <Button
-                    className="mt-10 bg-emerald-400 text-neutral-950 hover:bg-emerald-500"
+                    className="mt-10 w-full bg-emerald-400 text-neutral-950 hover:bg-emerald-500"
                     onClick={() => createCheckoutSession(isAnnualPlan)}
                   >
-                    Get access
+                    Get started
                   </Button>
                 ) : (
                   <Button
-                    className="mt-10 bg-emerald-400 text-neutral-950 hover:bg-emerald-500"
+                    className="mt-10 w-full bg-emerald-400 text-neutral-950 hover:bg-emerald-500"
                     asChild
                   >
                     <Link
@@ -163,7 +163,7 @@ export const PricingSection = () => {
                           : PRICING_PLANS_ID.MONTHLY)
                       }
                     >
-                      Get access
+                      Get started
                     </Link>
                   </Button>
                 )}

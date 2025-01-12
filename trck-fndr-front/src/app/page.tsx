@@ -1,7 +1,12 @@
 import { PricingSection } from "@/components/home/pricing";
 import { SignIn } from "@/components/trckfndr/signIn";
 import { Button } from "@/components/ui/button";
-import { ChartColumnIncreasingIcon } from "lucide-react";
+import {
+  ChartColumnIncreasingIcon,
+  ChartPieIcon,
+  ChartSplineIcon,
+  LockIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { ReactNode } from "react";
 
@@ -30,14 +35,15 @@ export default function Home() {
             size="lg"
             className="mr-4 bg-emerald-400 hover:bg-emerald-500"
           >
-            Get Started
+            <a href="#pricing">Get Started</a>
           </Button>
           <Button
             size="lg"
             variant="outline"
             className="border-emerald-50 bg-transparent text-emerald-50"
+            asChild
           >
-            Learn More
+            <a href="#features">Learn More</a>
           </Button>
         </section>
 
@@ -54,67 +60,22 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container mx-auto px-10 pt-40 pb-16">
+        <section className="container mx-auto px-10 pt-40 pb-16" id="features">
           <div className="grid md:grid-cols-3 gap-12">
             <FeatureSection
               title="Easy Tracking"
-              description="Automatically import and categorize your transactions for effortless financial management."
-              icon={
-                <svg
-                  className="w-12 h-12 text-emerald-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                  />
-                </svg>
-              }
+              description="Aggregate all your assets in one place for effortless financial management."
+              icon={<ChartSplineIcon className="w-12 h-12 text-emerald-400" />}
             />
             <FeatureSection
               title="Insightful Analytics"
-              description="Gain valuable insights into your spending habits with our powerful analytics tools."
-              icon={
-                <svg
-                  className="w-12 h-12 text-emerald-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              }
+              description="Gain valuable insights into your spending habits through budget analysis."
+              icon={<ChartPieIcon className="w-12 h-12 text-emerald-400" />}
             />
             <FeatureSection
               title="Secure & Private"
-              description="Your financial data is protected with bank-level security and encryption."
-              icon={
-                <svg
-                  className="w-12 h-12 text-emerald-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-              }
+              description="Your financial data is safe and access is revocable at anytime."
+              icon={<LockIcon className="w-12 h-12 text-emerald-400" />}
             />
           </div>
         </section>
@@ -128,8 +89,7 @@ export default function Home() {
             Ready to Take Control of Your Finances?
           </h2>
           <p className="text-lg text-emerald-50/80 mb-10 max-w-2xl mx-auto">
-            Join thousands of users who have simplified their financial
-            management with TrckFnds.
+            Start tracking your growth today with TrckFnds.
           </p>
           <Button size="lg" className="bg-emerald-400 hover:bg-emerald-500">
             Create an account
