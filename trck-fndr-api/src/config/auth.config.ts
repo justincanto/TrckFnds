@@ -42,10 +42,8 @@ export const authConfig: ExpressAuthConfig = {
     },
   },
   callbacks: {
-    session: async ({ session, token, user }) => {
-      // @ts-ignore
+    session: async ({ session, user }) => {
       session.user.isSubscribed = user.isSubscribed;
-      // @ts-ignore
       session.user.hasConnections = user.hasConnections;
       session.user.id = user.id!;
       return session;

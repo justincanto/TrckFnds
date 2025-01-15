@@ -139,53 +139,50 @@ export default function Dashboard() {
             </DropdownMenu>
           </div>
         </div>
-        {
-          //@ts-expect-error needed because of drizzle adapter wrong typing
-          session?.user?.hasConnections ? (
-            <div className="space-y-4">
-              <OverviewStats portfolioData={portfolioData} />
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <ChartModule
-                  className="col-span-4"
-                  title={"Overview"}
-                  description={"Detailed view of revenue & expenses"}
-                >
-                  <AreaChartRenderer
-                    chartConfig={chartConfig}
-                    chartData={portfolioEvolution!}
-                    dataKey="balance"
-                    axisDataKey="date"
-                  />
-                </ChartModule>
-                <>
-                  {balanceByCategory && (
-                    <ChartModule
-                      className="col-span-3"
-                      title={"Portfolio Breakdown"}
-                      description={"Assets by category"}
-                    >
-                      <PieChartRenderer
-                        chartConfig={pieChartConfig}
-                        dataKey="balance"
-                        nameKey="category"
-                        chartData={balanceByCategory}
-                        total={portfolioData?.balance}
-                        totalLabel="Portfolio Value"
-                      />
-                    </ChartModule>
-                  )}
-                </>
-              </div>
-              <AssetsAccordion assets={portfolioData?.assets} />
+        {session?.user?.hasConnections ? (
+          <div className="space-y-4">
+            <OverviewStats portfolioData={portfolioData} />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <ChartModule
+                className="col-span-4"
+                title={"Overview"}
+                description={"Detailed view of revenue & expenses"}
+              >
+                <AreaChartRenderer
+                  chartConfig={chartConfig}
+                  chartData={portfolioEvolution!}
+                  dataKey="balance"
+                  axisDataKey="date"
+                />
+              </ChartModule>
+              <>
+                {balanceByCategory && (
+                  <ChartModule
+                    className="col-span-3"
+                    title={"Portfolio Breakdown"}
+                    description={"Assets by category"}
+                  >
+                    <PieChartRenderer
+                      chartConfig={pieChartConfig}
+                      dataKey="balance"
+                      nameKey="category"
+                      chartData={balanceByCategory}
+                      total={portfolioData?.balance}
+                      totalLabel="Portfolio Value"
+                    />
+                  </ChartModule>
+                )}
+              </>
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-y-4 min-h-[80vh]">
-              <h2>No connections yet</h2>
-              <p>Connect your first source to start tracking your assets</p>
-              <AddConnection />
-            </div>
-          )
-        }
+            <AssetsAccordion assets={portfolioData?.assets} />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-y-4 min-h-[80vh]">
+            <h2>No connections yet</h2>
+            <p>Connect your first source to start tracking your assets</p>
+            <AddConnection />
+          </div>
+        )}
       </div>
     </div>
   );

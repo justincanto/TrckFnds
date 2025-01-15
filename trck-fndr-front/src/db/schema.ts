@@ -18,6 +18,8 @@ export const users = pgTable("user", {
   image: text("image"),
   isSubscribed: boolean("isSubscribed").default(false).notNull(),
   hasConnections: boolean("hasConnections").default(false).notNull(),
+  customerId: text("customerId").unique(),
+  planId: text("planId"),
 });
 
 export const accounts = pgTable(

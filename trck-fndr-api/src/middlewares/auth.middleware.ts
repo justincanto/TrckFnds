@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getSession } from "@auth/express";
 import { authConfig } from "../config/auth.config.js";
 import type { NextFunction, Request, Response } from "express";

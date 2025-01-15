@@ -23,7 +23,6 @@ export const SignIn = () => {
       </Button>
     );
   }
-  //@ts-expect-error needed because of drizzle adapter wrong typing
   return user.user.isSubscribed ? (
     <Link href="/dashboard" className="flex items-center">
       Dashboard
