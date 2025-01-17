@@ -1,7 +1,7 @@
 import { users } from "@/db/schema";
 import { InferSelectModel } from "drizzle-orm";
 
-declare module "@auth/core/adapters" {
+declare module "next-auth/adapters" {
   interface AdapterUser extends InferSelectModel<typeof users> {
     isSubscribed: boolean;
     hasConnections: boolean;
