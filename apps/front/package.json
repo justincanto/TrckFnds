@@ -1,5 +1,5 @@
 {
-  "name": "track-fundr-front",
+  "name": "@trck-funds/front",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@trck-fnds/shared": "workspace:*",
     "@auth/drizzle-adapter": "^1.7.4",
     "@hookform/resolvers": "^3.9.1",
     "@neondatabase/serverless": "^0.10.4",
