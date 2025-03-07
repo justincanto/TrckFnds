@@ -1,0 +1,7 @@
+export enum AssetCategory {
+  CRYPTO = "CRYPTO",
+  BANK_ACCOUNT = "BANK_ACCOUNT",
+  BANK_PASSBOOK = "BANK_PASSBOOK",
+  STOCKS = "STOCKS",
+  REAL_ESTATE = "REAL_ESTATE",
+}

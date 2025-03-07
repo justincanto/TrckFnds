@@ -1,4 +1,4 @@
-import { AssetCategory } from "../portfolio/types";
+import { AssetCategory } from "@trck-fnds/shared";
 import { PowensAccountType } from "./types";
 
 export const ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE: {

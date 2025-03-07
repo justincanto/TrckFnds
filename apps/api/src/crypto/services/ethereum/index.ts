@@ -16,10 +16,10 @@ import {
 } from "../../constants";
 import { Blockchain, EthereumBlockchain } from "../../types";
 import {
-  AssetCategory,
   EthereumTokenObject,
   EthSourceDetails,
 } from "../../../portfolio/types";
+import { AssetCategory } from "@trck-fnds/shared";
 import { ConnectionType } from "../../../types/connection";
 import { setUserHasConnections } from "../../../user/service";
 import { getCryptoPrice } from "../../utils";

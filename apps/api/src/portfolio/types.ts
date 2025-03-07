@@ -1,6 +1,7 @@
 import { Crypto, EthereumBlockchain } from "../crypto/types";
 import { ConnectionType } from "../types/connection";
 import { Currency } from "../types/currency";
+import { AssetCategory } from "@trck-fnds/shared";
 
 export type SourceAccount =
   | EthSourceDetails
@@ -63,12 +64,4 @@ interface BinanceSourceDetails {
   logo: string | undefined;
   tokens: Token[];
   connectionType: ConnectionType;
-}
-
-export enum AssetCategory {
-  CRYPTO = "CRYPTO",
-  BANK_ACCOUNT = "BANK_ACCOUNT",
-  BANK_PASSBOOK = "BANK_PASSBOOK",
-  STOCKS = "STOCKS",
-  REAL_ESTATE = "REAL_ESTATE",
 }

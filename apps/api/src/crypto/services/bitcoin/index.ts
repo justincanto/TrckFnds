@@ -3,7 +3,7 @@ import { ConnectionType } from "../../../types/connection";
 import { btcWalletConnection, User, userConnection } from "../../../db/schema";
 import { setUserHasConnections } from "../../../user/service";
 import { db } from "../../../db";
-import { AssetCategory } from "../../../portfolio/types";
+import { AssetCategory } from "@trck-fnds/shared";
 import { getCryptoPrice } from "../../utils";
 import { Layer1Token } from "../../types";
 import { eq } from "drizzle-orm";
