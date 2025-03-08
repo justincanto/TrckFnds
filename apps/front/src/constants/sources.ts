@@ -1,4 +1,4 @@
-import { ConnectionType } from "@/types/source";
+import { ConnectionType } from "@trck-fnds/shared";
 
 export const CONNECTION_SOURCES = [
   {

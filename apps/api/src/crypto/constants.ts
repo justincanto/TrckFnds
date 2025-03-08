@@ -1,6 +1,10 @@
 import { Web3 } from "web3";
 import { RegisteredSubscription } from "web3/lib/commonjs/eth.exports";
-import { Blockchain, EthereumBlockchain, Layer1Blockchain } from "./types";
+import {
+  Blockchain,
+  EthereumBlockchain,
+  Layer1Blockchain,
+} from "@trck-fnds/shared";
 
 export const BLOCKCHAINS: {
   [key in Blockchain]: {

@@ -1,9 +1,12 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../db";
 import { binanceConnection, User, userConnection } from "../../../db/schema";
-import { AssetCategory } from "@trck-fnds/shared";
-import { ConnectionType } from "../../../types/connection";
-import { EthereumToken, Layer1Token } from "../../types";
+import {
+  AssetCategory,
+  EthereumToken,
+  Layer1Token,
+  ConnectionType,
+} from "@trck-fnds/shared";
 import axios from "axios";
 import { getCryptoPrice } from "../../utils";
 import { setUserHasConnections } from "../../../user/service";

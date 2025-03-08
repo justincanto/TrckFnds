@@ -1,9 +1,4 @@
-import {
-  Asset,
-  BinanceSourceDetails,
-  EthSourceDetails,
-  EthereumToken,
-} from "@/types/portfolio";
+import { Asset } from "@/types/portfolio";
 import {
   Accordion,
   AccordionContent,
@@ -13,7 +8,12 @@ import {
 import { formatCurrency } from "@/utils/format";
 import { ASSET_CATEGORY_LABEL } from "@/constants/portfolio";
 import Image from "next/image";
-import { ConnectionType } from "@/types/source";
+import {
+  ConnectionType,
+  BinanceSourceDetails,
+  EthSourceDetails,
+  IEthereumToken,
+} from "@trck-fnds/shared";
 import { Separator } from "../ui/separator";
 
 export const AssetsAccordion = ({
@@ -73,7 +73,7 @@ export const AssetsAccordion = ({
                             const blockchain =
                               account.connectionType ===
                               ConnectionType.ETH_WALLET
-                                ? ` (${(token as EthereumToken).blockchain})`
+                                ? ` (${(token as IEthereumToken).blockchain})`
                                 : "";
                             return (
                               <div
@@ -81,7 +81,7 @@ export const AssetsAccordion = ({
                                 className="flex justify-between mr-8 py-1.5 items-center"
                               >
                                 <p>
-                                  {(token as EthereumToken).name}
+                                  {(token as IEthereumToken).name}
                                   {blockchain}
                                 </p>
                                 <p>{formatCurrency(token.usdValue)}</p>

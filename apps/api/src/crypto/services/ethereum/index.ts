@@ -14,13 +14,14 @@ import {
   MULTI_CALL_ABI,
   MULTI_CALL_ADDRESS,
 } from "../../constants";
-import { Blockchain, EthereumBlockchain } from "../../types";
 import {
-  EthereumTokenObject,
+  AssetCategory,
+  Blockchain,
+  EthereumBlockchain,
+  ConnectionType,
+  IEthereumToken,
   EthSourceDetails,
-} from "../../../portfolio/types";
-import { AssetCategory } from "@trck-fnds/shared";
-import { ConnectionType } from "../../../types/connection";
+} from "@trck-fnds/shared";
 import { setUserHasConnections } from "../../../user/service";
 import { getCryptoPrice } from "../../utils";
 
@@ -187,7 +188,7 @@ const getWalletsBalancesByChains = async (
 const getWalletBalances = (
   walletsBalancesByChains: {
     wallets: EthWalletConnection[];
-    tokens: EthereumTokenObject[];
+    tokens: IEthereumToken[];
   }[]
 ) => {
   return walletsBalancesByChains.reduce<EthSourceDetails[]>(

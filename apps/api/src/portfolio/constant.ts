@@ -1,7 +1,7 @@
 import { getBankAccountsOverview } from "../bank/service";
 import { getEthWalletBalances } from "../crypto/services/ethereum";
 import { getBinanceWalletBalances } from "../crypto/services/binance";
-import { ConnectionType } from "../types/connection";
+import { ConnectionType } from "@trck-fnds/shared";
 import { SourceAccount } from "./types";
 import { getBtcWalletBalances } from "../crypto/services/bitcoin";
 

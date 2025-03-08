@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Crypto } from "./types";
+import { Crypto } from "@trck-fnds/shared";
 
 export const getCryptoPrice = async (crypto: Crypto) => {
   const price = await axios.get(

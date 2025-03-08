@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { exchangeRate } from "../db/schema";
-import { Currency } from "../types/currency";
+import { Currency } from "@trck-fnds/shared";
 
 export const convertCurrency = async (
   amount: number,

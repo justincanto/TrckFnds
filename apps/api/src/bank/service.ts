@@ -4,11 +4,10 @@ import { bankConnection, User, userConnection } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { PowensBankAccounts, PowensTransaction } from "./types";
 import { convertCurrency } from "../currency/service";
-import { Currency } from "../types/currency";
 import dayjs from "dayjs";
 import { ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE } from "./constant";
 import { CONNECTION_SOURCES } from "../constants/sources";
-import { ConnectionType } from "../types/connection";
+import { ConnectionType, Currency } from "@trck-fnds/shared";
 import { setUserHasConnections } from "../user/service";
 
 export const getConnectionUrl = async (user: User, connectorId: number) => {
