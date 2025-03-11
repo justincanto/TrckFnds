@@ -8,12 +8,8 @@ import {
   DialogTrigger,
 } from "../../ui/dialog";
 import { Button } from "../../ui/button";
-import {
-  CONNECTION_SOURCES,
-  TOP_CONNECTION_SOURCES,
-} from "@/constants/sources";
 import { ConnectionSource } from "@/types/source";
-import { ConnectionType } from "@trck-fnds/shared";
+import { ConnectionType, CONNECTION_SOURCES } from "@trck-fnds/shared";
 import Image from "next/image";
 import React, { ReactNode, useState } from "react";
 import { Input } from "../../ui/input";
