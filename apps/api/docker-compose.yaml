@@ -1,14 +1,16 @@
 version: "3.8"
 
 services:
-  app:
+  api:
     build:
-      context: .
-      dockerfile: Dockerfile
-    working_dir: /app
+      context: ../../ # Point to the monorepo root
+      dockerfile: apps/api/Dockerfile
+    working_dir: /monorepo/apps/api
     volumes:
-      - .:/app
-      - /app/node_modules
+      - ../../:/monorepo # Mount the entire monorepo
+      - /monorepo/node_modules
+      - /monorepo/apps/api/node_modules
+      - /monorepo/packages/shared/node_modules
     ports:
       - "3001:3001"
     command: pnpm start
