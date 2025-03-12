@@ -3,7 +3,7 @@ import { getUserRevenuesAndExpensesByMonthWithEvolution } from "../bank/service"
 import { db } from "../db";
 import { accountSnapshot, userConnection, users } from "../db/schema";
 import { SERVICE_BY_CONNECTION_TYPE } from "./constant";
-import { SourceAccount } from "./types";
+import { SourceAccount } from "@trck-fnds/shared";
 import dayjs from "dayjs";
 
 export const getPortfolioOverview = async (userId: string) => {
