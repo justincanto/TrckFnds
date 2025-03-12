@@ -1,4 +1,4 @@
-import { Currency } from "@trck-fnds/shared";
+import { Currency } from "@trckfnds/shared";
 
 export interface PowensTransaction {
   value: number;

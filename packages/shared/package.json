@@ -1,5 +1,5 @@
 {
-  "name": "@trck-fnds/shared",
+  "name": "@trckfnds/shared",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13"
   }
 }

@@ -1,13 +1,13 @@
 {
-  "name": "trck-fnds",
+  "name": "trckfnds",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "pnpm -r dev",
     "build": "pnpm -r build",
-    "dev:front": "pnpm --filter @trck-fnds/front dev",
-    "dev:api": "pnpm --filter @trck-fnds/api dev"
+    "dev:front": "pnpm --filter @trckfnds/front dev",
+    "dev:api": "pnpm --filter @trckfnds/api dev"
   },
   "keywords": [],
   "author": "",

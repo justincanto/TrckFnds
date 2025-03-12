@@ -3,7 +3,8 @@ import { getUserRevenuesAndExpensesByMonthWithEvolution } from "../bank/service"
 import { db } from "../db";
 import { accountSnapshot, userConnection, users } from "../db/schema";
 import { SERVICE_BY_CONNECTION_TYPE } from "./constant";
-import { SourceAccount } from "@trck-fnds/shared";
+import { SourceAccount } from "@trckfnds/shared";
+import { TimeRange, getTimeRangeStartDate } from "@trckfnds/shared";
 import dayjs from "dayjs";
 
 export const getPortfolioOverview = async (userId: string) => {
@@ -57,7 +58,13 @@ export const getAllUserAccounts = async (userId: string) => {
   ).flat();
 };
 
-export const getPortfolioEvolution = async (userId: string) => {
+export const getPortfolioEvolution = async (
+  userId: string,
+  timeRange: TimeRange = TimeRange.MONTH
+) => {
+  const today = dayjs();
+  const startDate = getTimeRangeStartDate(timeRange);
+
   const snapshotsPerDay = await db
     .select({
       balance: sum(accountSnapshot.balance),
@@ -72,12 +79,12 @@ export const getPortfolioEvolution = async (userId: string) => {
     date: dayjs(snapshot.date).format("DD/MM"),
   }));
 
-  const today = dayjs();
-  const past30Days = Array.from({ length: 30 }, (_, i) =>
+  const daysToShow = today.diff(startDate, "day");
+  const pastDays = Array.from({ length: daysToShow }, (_, i) =>
     today.subtract(i, "day").format("DD/MM")
   ).reverse();
 
-  const snapshotsWithPastDates = past30Days.map((date) => {
+  const snapshotsWithPastDates = pastDays.map((date) => {
     const snapshot = formattedSnapshots.find((s) => s.date === date);
     return snapshot || { date, balance: 0 };
   });

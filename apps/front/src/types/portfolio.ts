@@ -1,4 +1,4 @@
-import { AssetCategory, SourceAccount } from "@trck-fnds/shared";
+import { AssetCategory, SourceAccount } from "@trckfnds/shared";
 
 export interface Asset {
   category: AssetCategory;

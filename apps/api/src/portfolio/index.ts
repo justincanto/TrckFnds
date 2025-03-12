@@ -4,6 +4,7 @@ import { createEthereumWalletConnection } from "../crypto/services/ethereum";
 import { User } from "../db/schema";
 import { createBinanceWalletConnection } from "../crypto/services/binance";
 import { createBitcoinWalletConnection } from "../crypto/services/bitcoin";
+import { TimeRange } from "@trckfnds/shared";
 
 const portfolioRouter = createRouter();
 
@@ -17,8 +18,9 @@ portfolioRouter.get("/overview", async (req, res) => {
 
 portfolioRouter.get("/evolution", async (req, res) => {
   const { user } = res.locals.session;
+  const timeRange = (req.query.timeRange as TimeRange) || TimeRange.MONTH;
 
-  const portfolioEvolution = await getPortfolioEvolution(user.id);
+  const portfolioEvolution = await getPortfolioEvolution(user.id, timeRange);
 
   res.send({ portfolioEvolution });
 });

@@ -25,7 +25,7 @@ import { ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
-import { EthereumBlockchain } from "@trck-fnds/shared";
+import { EthereumBlockchain } from "@trckfnds/shared";
 
 export const BankConnector = ({
   connector,

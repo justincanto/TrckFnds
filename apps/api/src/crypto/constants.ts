@@ -4,7 +4,7 @@ import {
   Blockchain,
   EthereumBlockchain,
   Layer1Blockchain,
-} from "@trck-fnds/shared";
+} from "@trckfnds/shared";
 
 export const BLOCKCHAINS: {
   [key in Blockchain]: {

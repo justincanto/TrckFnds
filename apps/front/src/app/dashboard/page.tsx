@@ -20,6 +20,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ASSET_CATEGORY_LABEL } from "@/constants/portfolio";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TimeRange, TIME_RANGE_LABEL } from "@trckfnds/shared";
 
 const chartConfig = {
   desktop: {
@@ -59,10 +67,11 @@ const getPortfolioData = async () => {
   );
 };
 
-const getPortfolioEvolution = async () => {
+const getPortfolioEvolution = async (timeRange: TimeRange) => {
   return axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/portfolio/evolution`,
     {
+      params: { timeRange },
       withCredentials: true,
     }
   );
@@ -87,6 +96,7 @@ export default function Dashboard() {
   const [portfolioEvolution, setPortfolioEvolution] = useState<
     null | { balance: number; date: string }[]
   >(null);
+  const [timeRange, setTimeRange] = useState<TimeRange>(TimeRange.MONTH);
 
   const { data: session } = useSession();
 
@@ -94,10 +104,10 @@ export default function Dashboard() {
     getPortfolioData().then((response) => {
       setPortfolioData(response.data);
     });
-    getPortfolioEvolution().then((response) => {
+    getPortfolioEvolution(timeRange).then((response) => {
       setPortfolioEvolution(response.data.portfolioEvolution);
     });
-  }, []);
+  }, [timeRange]);
 
   const balanceByCategory = useMemo(() => {
     return portfolioData?.assets.map((asset, i) => ({
@@ -144,6 +154,23 @@ export default function Dashboard() {
                 className="col-span-4"
                 title={"Overview"}
                 description={"Detailed view of revenue & expenses"}
+                headerRight={
+                  <Select
+                    value={timeRange}
+                    onValueChange={(value) => setTimeRange(value as TimeRange)}
+                  >
+                    <SelectTrigger className="w-44">
+                      <SelectValue placeholder="Time range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.keys(TIME_RANGE_LABEL).map((range) => (
+                        <SelectItem key={range} value={range}>
+                          {TIME_RANGE_LABEL[range as TimeRange]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                }
               >
                 <AreaChartRenderer
                   chartConfig={chartConfig}

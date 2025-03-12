@@ -6,11 +6,7 @@ import { PowensBankAccounts, PowensTransaction } from "./types";
 import { convertCurrency } from "../currency/service";
 import dayjs from "dayjs";
 import { ASSET_TYPE_BY_POWENS_ACCOUNT_TYPE } from "./constant";
-import {
-  ConnectionType,
-  Currency,
-  CONNECTION_SOURCES,
-} from "@trck-fnds/shared";
+import { ConnectionType, Currency, CONNECTION_SOURCES } from "@trckfnds/shared";
 import { setUserHasConnections } from "../user/service";
 
 export const getConnectionUrl = async (user: User, connectorId: number) => {

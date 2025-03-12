@@ -13,7 +13,7 @@ import {
   BinanceSourceDetails,
   EthSourceDetails,
   IEthereumToken,
-} from "@trck-fnds/shared";
+} from "@trckfnds/shared";
 import { Separator } from "../ui/separator";
 
 export const AssetsAccordion = ({

@@ -21,7 +21,7 @@ import {
   ConnectionType,
   IEthereumToken,
   EthSourceDetails,
-} from "@trck-fnds/shared";
+} from "@trckfnds/shared";
 import { setUserHasConnections } from "../../../user/service";
 import { getCryptoPrice } from "../../utils";
 

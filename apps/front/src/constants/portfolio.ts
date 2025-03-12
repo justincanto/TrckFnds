@@ -1,4 +1,4 @@
-import { AssetCategory } from "@trck-fnds/shared";
+import { AssetCategory } from "@trckfnds/shared";
 
 export const ASSET_CATEGORY_LABEL = {
   [AssetCategory.CRYPTO]: "Crypto",

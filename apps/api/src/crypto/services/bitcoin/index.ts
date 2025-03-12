@@ -2,7 +2,7 @@ import axios from "axios";
 import { btcWalletConnection, User, userConnection } from "../../../db/schema";
 import { setUserHasConnections } from "../../../user/service";
 import { db } from "../../../db";
-import { AssetCategory, Layer1Token, ConnectionType } from "@trck-fnds/shared";
+import { AssetCategory, Layer1Token, ConnectionType } from "@trckfnds/shared";
 import { getCryptoPrice } from "../../utils";
 import { eq } from "drizzle-orm";
 import { SATOSHIS_PER_BITCOIN } from "../../constants";

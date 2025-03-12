@@ -6,7 +6,7 @@ import {
   EthereumToken,
   Layer1Token,
   ConnectionType,
-} from "@trck-fnds/shared";
+} from "@trckfnds/shared";
 import axios from "axios";
 import { getCryptoPrice } from "../../utils";
 import { setUserHasConnections } from "../../../user/service";

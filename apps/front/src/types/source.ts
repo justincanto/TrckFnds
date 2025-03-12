@@ -1,4 +1,4 @@
-import { ConnectionType } from "@trck-fnds/shared";
+import { ConnectionType } from "@trckfnds/shared";
 
 export interface ConnectionSource {
   id?: number;

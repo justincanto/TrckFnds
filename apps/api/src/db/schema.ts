@@ -11,7 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/express/adapters";
 import { InferSelectModel } from "drizzle-orm";
-import { Crypto, ConnectionType } from "@trck-fnds/shared";
+import { Crypto, ConnectionType } from "@trckfnds/shared";
 
 export const users = pgTable("user", {
   id: text("id")

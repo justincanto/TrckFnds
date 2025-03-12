@@ -9,7 +9,7 @@ import {
 } from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import { ConnectionSource } from "@/types/source";
-import { ConnectionType, CONNECTION_SOURCES } from "@trck-fnds/shared";
+import { ConnectionType, CONNECTION_SOURCES } from "@trckfnds/shared";
 import Image from "next/image";
 import React, { ReactNode, useState } from "react";
 import { Input } from "../../ui/input";
