@@ -17,12 +17,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { ASSET_CATEGORY_LABEL } from "@/constants/portfolio";
 
 const chartConfig = {
   desktop: {
@@ -104,7 +101,7 @@ export default function Dashboard() {
 
   const balanceByCategory = useMemo(() => {
     return portfolioData?.assets.map((asset, i) => ({
-      category: asset.category,
+      category: ASSET_CATEGORY_LABEL[asset.category],
       balance: asset.balance,
       formattedBalance: formatCurrency(asset.balance)!,
       fill: `var(--color-${i + 1})`,
