@@ -70,3 +70,7 @@ export interface BinanceSourceDetails {
   tokens: Token[];
   connectionType: ConnectionType;
 }
+
+export interface RevenuesAndExpensesByMonth {
+  [key: string]: { revenues: number; expenses: number };
+}

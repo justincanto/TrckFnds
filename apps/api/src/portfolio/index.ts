@@ -1,4 +1,8 @@
-import { getPortfolioEvolution, getPortfolioOverview } from "./service";
+import {
+  getPortfolioEvolution,
+  getPortfolioOverview,
+  getRevenueAndExpensesByMonth,
+} from "./service";
 import { createRouter } from "../../utils/create-router";
 import { createEthereumWalletConnection } from "../crypto/services/ethereum";
 import { User } from "../db/schema";
@@ -63,6 +67,16 @@ portfolioRouter.post("/connect/binance", async (req, res) => {
   );
 
   res.send(connection);
+});
+
+portfolioRouter.get("/revenues-expenses/evolution", async (req, res) => {
+  const { user } = res.locals.session;
+
+  const revenuesAndExpensesByMonth = await getRevenueAndExpensesByMonth(
+    user.id
+  );
+
+  res.send(revenuesAndExpensesByMonth);
 });
 
 export default portfolioRouter;

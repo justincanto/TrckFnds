@@ -6,8 +6,11 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { formatCurrency } from "@/utils/format";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import { ValueType } from "recharts/types/component/DefaultTooltipContent";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 
 const AreaChartRenderer = ({
   chartConfig,
@@ -28,9 +31,15 @@ const AreaChartRenderer = ({
         margin={{
           left: 12,
           right: 12,
+          top: 24,
         }}
       >
         <CartesianGrid vertical={false} />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => `$${value}`}
+        />
         <XAxis
           dataKey={axisDataKey}
           tickLine={false}
@@ -40,15 +49,18 @@ const AreaChartRenderer = ({
         <ChartTooltip
           cursor={false}
           content={
-            <ChartTooltipContent indicator="dot" formatter={tooltipFormatter} />
+            <ChartTooltipContent
+              indicator="dot"
+              formatter={(value, dataKey) => tooltipFormatter(value, dataKey)}
+            />
           }
         />
         <Area
           dataKey={dataKey}
           type="natural"
-          fill="#2662D9"
+          fill={`var(--color-${dataKey})`}
           fillOpacity={0.4}
-          stroke="#2662D9"
+          stroke={`var(--color-${dataKey})`}
           stackId="a"
         />
       </AreaChart>
@@ -58,10 +70,10 @@ const AreaChartRenderer = ({
 
 export default AreaChartRenderer;
 
-const tooltipFormatter = (value: ValueType) => {
+const tooltipFormatter = (value: ValueType, dataKey: NameType) => {
   return (
     <div className="flex gap-x-2 items-center">
-      <div className="h-2.5 w-2.5 bg-[#2662D9] rounded-[2px]" />
+      <div className={`h-2.5 w-2.5 bg-[--color-${dataKey}] rounded-[2px]`} />
       <span>{formatCurrency(value as number)}</span>
     </div>
   );

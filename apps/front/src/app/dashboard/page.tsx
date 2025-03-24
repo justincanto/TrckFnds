@@ -27,14 +27,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TimeRange, TIME_RANGE_LABEL } from "@trckfnds/shared";
+import {
+  TimeRange,
+  TIME_RANGE_LABEL,
+  RevenuesAndExpensesByMonth,
+} from "@trckfnds/shared";
+import BarChartRenderer from "@/components/renderer/BarChartRenderer";
 
-const chartConfig = {
-  desktop: {
+const areaChartConfig = {
+  balance: {
+    label: "Balance",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig;
+
+const barChartConfig = {
+  revenues: {
     label: "Revenue",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
+  expenses: {
     label: "Expenses",
     color: "hsl(var(--chart-5))",
   },
@@ -89,6 +101,15 @@ const createPortalSession = async () => {
   window.location = sessionUrl;
 };
 
+const getRevenuesAndExpensesEvolution = async () => {
+  return axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/portfolio/revenues-expenses/evolution`,
+    {
+      withCredentials: true,
+    }
+  );
+};
+
 export default function Dashboard() {
   const [portfolioData, setPortfolioData] = useState<null | PortfolioData>(
     null
@@ -98,6 +119,9 @@ export default function Dashboard() {
   >(null);
   const [timeRange, setTimeRange] = useState<TimeRange>(TimeRange.MONTH);
 
+  const [revenuesAndExpensesEvolution, setRevenuesAndExpensesEvolution] =
+    useState<null | RevenuesAndExpensesByMonth>(null);
+
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -106,6 +130,10 @@ export default function Dashboard() {
     });
     getPortfolioEvolution(timeRange).then((response) => {
       setPortfolioEvolution(response.data.portfolioEvolution);
+    });
+
+    getRevenuesAndExpensesEvolution().then((response) => {
+      setRevenuesAndExpensesEvolution(response.data);
     });
   }, [timeRange]);
 
@@ -173,7 +201,7 @@ export default function Dashboard() {
                 }
               >
                 <AreaChartRenderer
-                  chartConfig={chartConfig}
+                  chartConfig={areaChartConfig}
                   chartData={portfolioEvolution!}
                   dataKey="balance"
                   axisDataKey="date"
@@ -199,6 +227,26 @@ export default function Dashboard() {
               </>
             </div>
             <AssetsAccordion assets={portfolioData?.assets} />
+            <ChartModule
+              className="col-span-3"
+              title={"Revenue & Expenses Evolution"}
+              description={"Monthly evolution of revenue & expenses"}
+            >
+              <>
+                {revenuesAndExpensesEvolution && (
+                  <BarChartRenderer
+                    chartConfig={barChartConfig}
+                    chartData={Object.keys(revenuesAndExpensesEvolution).map(
+                      (month) => ({
+                        month: month,
+                        expenses: revenuesAndExpensesEvolution[month].expenses,
+                        revenues: revenuesAndExpensesEvolution[month].revenues,
+                      })
+                    )}
+                  />
+                )}
+              </>
+            </ChartModule>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-y-4 min-h-[80vh]">

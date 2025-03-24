@@ -140,7 +140,9 @@ export type EthWalletConnection = InferSelectModel<typeof ethWalletConnection>;
 export const walletBlockchain = pgTable(
   "walletBlockchain",
   {
-    walletId: text("walletId").references(() => ethWalletConnection.id),
+    walletId: text("walletId")
+      .notNull()
+      .references(() => ethWalletConnection.id),
     blockchain: BlockchainEnum().notNull(),
   },
   (walletBlockchain) => ({
@@ -215,4 +217,17 @@ export const accountSnapshot = pgTable("accountSnapshot", {
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+});
+
+export const bankTransaction = pgTable("bankTransaction", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  powensId: text("powensId").notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  amount: doublePrecision("amount").notNull(),
+  label: text("label").notNull(),
+  timestamp: timestamp("timestamp", { mode: "date" }).notNull(),
 });

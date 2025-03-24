@@ -5,14 +5,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const BarChartRenderer = ({
   chartConfig,
@@ -22,61 +15,29 @@ const BarChartRenderer = ({
   chartData: Record<string, string | number>[];
 }) => {
   return (
-    <ChartContainer config={chartConfig}>
-      <BarChart
-        accessibilityLayer
-        data={chartData}
-        layout="vertical"
-        margin={{
-          right: 16,
-        }}
-      >
-        <CartesianGrid horizontal={false} />
+    <ChartContainer config={chartConfig} className="max-h-[20rem] w-full">
+      <BarChart accessibilityLayer data={chartData}>
+        <CartesianGrid vertical={false} />
         <YAxis
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => `$${value}`}
+        />
+        <XAxis
           dataKey="month"
-          type="category"
           tickLine={false}
           tickMargin={10}
           axisLine={false}
           tickFormatter={(value) => value.slice(0, 3)}
-          hide
         />
-        <XAxis dataKey="desktop" type="number" hide />
         <ChartTooltip
           cursor={false}
-          content={<ChartTooltipContent indicator="line" />}
+          content={<ChartTooltipContent indicator="dashed" />}
         />
-        <Bar
-          dataKey="desktop"
-          layout="vertical"
-          fill="var(--color-desktop)"
-          radius={4}
-        >
-          <LabelList
-            dataKey="month"
-            position="insideLeft"
-            offset={8}
-            className="fill-[--color-label]"
-            fontSize={12}
-          />
-          <LabelList
-            dataKey="desktop"
-            position="right"
-            offset={8}
-            className="fill-foreground"
-            fontSize={12}
-          />
-        </Bar>
+        <Bar dataKey="expenses" fill="var(--color-expenses)" radius={4} />
+        <Bar dataKey="revenues" fill="var(--color-revenues)" radius={4} />
       </BarChart>
     </ChartContainer>
-    // <CardFooter className="flex-col items-start gap-2 text-sm">
-    //     <div className="flex gap-2 font-medium leading-none">
-    //         Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-    //     </div>
-    //     <div className="leading-none text-muted-foreground">
-    //         Showing total visitors for the last 6 months
-    //     </div>
-    // </CardFooter>
   );
 };
 

@@ -8,6 +8,7 @@ import { authenticatedUser } from "./middlewares/auth.middleware";
 import portfolioRouter from "./portfolio";
 import "./currency/cron";
 import "./portfolio/cron";
+import "./bank/cron";
 import subscriptionRouter, { subscriptionWebhookRouter } from "./subscription";
 
 const PORT = process.env.PORT;

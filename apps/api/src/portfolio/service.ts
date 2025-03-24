@@ -1,9 +1,9 @@
-import { eq, sum } from "drizzle-orm";
+import { and, eq, gte, sum } from "drizzle-orm";
 import { getUserRevenuesAndExpensesByMonthWithEvolution } from "../bank/service";
 import { db } from "../db";
-import { accountSnapshot, userConnection, users } from "../db/schema";
+import { accountSnapshot, bankTransaction, userConnection } from "../db/schema";
 import { SERVICE_BY_CONNECTION_TYPE } from "./constant";
-import { SourceAccount } from "@trckfnds/shared";
+import { RevenuesAndExpensesByMonth, SourceAccount } from "@trckfnds/shared";
 import { TimeRange, getTimeRangeStartDate } from "@trckfnds/shared";
 import dayjs from "dayjs";
 
@@ -90,4 +90,50 @@ export const getPortfolioEvolution = async (
   });
 
   return snapshotsWithPastDates;
+};
+
+export const getRevenueAndExpensesByMonth = async (userId: string) => {
+  const bankTransactions = await db
+    .select()
+    .from(bankTransaction)
+    .where(
+      and(
+        eq(bankTransaction.userId, userId),
+        gte(
+          bankTransaction.timestamp,
+          dayjs().subtract(12, "months").startOf("month").toDate()
+        )
+      )
+    );
+
+  const lastTwelveMonths = Array.from({ length: 12 }, (_, i) => {
+    const month = dayjs().subtract(i, "month").format("MMMM YYYY");
+    return { [month]: { expenses: 0, revenues: 0 } };
+  })
+    .reverse()
+    .reduce((acc, monthObj) => ({ ...acc, ...monthObj }), {});
+
+  return bankTransactions.reduce((acc, transaction) => {
+    const month = dayjs(transaction.timestamp).format("MMMM YYYY");
+
+    if (transaction.amount > 0) {
+      return {
+        ...acc,
+        [month]: {
+          ...acc[month],
+          revenues:
+            acc[month]?.revenues + transaction.amount || transaction.amount,
+        },
+      };
+    }
+
+    return {
+      ...acc,
+      [month]: {
+        ...acc[month],
+        expenses:
+          acc[month]?.expenses - transaction.amount || -transaction.amount,
+      },
+    };
+  }, lastTwelveMonths as RevenuesAndExpensesByMonth);
 };
