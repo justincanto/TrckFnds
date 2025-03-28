@@ -99,7 +99,7 @@ const Connector = ({ connector }: { connector: ConnectionSource }) => {
             className="w-7 h-7 p-1 object-contain rounded-full"
           />
         ) : (
-          <LucideLink className="w-7 h-7" />
+          <LucideLink className="!w-7" />
         )}
         {connector.name}
       </div>

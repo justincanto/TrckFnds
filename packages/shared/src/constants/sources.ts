@@ -4,6 +4,7 @@ export const CONNECTION_SOURCES = [
   {
     name: "American Express",
     id: 30,
+    logo: "american-express.jpeg",
     connectionType: ConnectionType.POWENS,
   },
   {
@@ -18,6 +19,7 @@ export const CONNECTION_SOURCES = [
   },
   {
     name: "AXA Banque",
+    logo: "axa-banque.png",
     id: 21,
     connectionType: ConnectionType.POWENS,
   },
@@ -33,6 +35,7 @@ export const CONNECTION_SOURCES = [
   },
   {
     name: "Banque Populaire",
+    logo: "banque-populaire.png",
     id: 15,
     connectionType: ConnectionType.POWENS,
   },
@@ -43,11 +46,13 @@ export const CONNECTION_SOURCES = [
   },
   {
     name: "BforBank",
+    logo: "b-for-bank.png",
     id: 66,
     connectionType: ConnectionType.POWENS,
   },
   {
     name: "BNP Paribas",
+    logo: "bnp-paribas.png",
     id: 3,
     connectionType: ConnectionType.POWENS,
   },
@@ -60,16 +65,19 @@ export const CONNECTION_SOURCES = [
   },
   {
     name: "BRED",
+    logo: "banque-populaire.png",
     id: 11,
     connectionType: ConnectionType.POWENS,
   },
   {
     name: "Caisse d'Épargne Particuliers",
+    logo: "caisse-epargne.jpg",
     id: 780,
     connectionType: ConnectionType.POWENS,
   },
   {
     name: "Caisse d'Épargne Professionnels",
+    logo: "caisse-epargne.jpg",
     id: 12,
     connectionType: ConnectionType.POWENS,
   },
@@ -91,6 +99,7 @@ export const CONNECTION_SOURCES = [
   {
     name: "CIC",
     id: 10,
+    logo: "cic.jpg",
     connectionType: ConnectionType.POWENS,
   },
   {
@@ -117,16 +126,19 @@ export const CONNECTION_SOURCES = [
   },
   {
     name: "Crédit Mutuel",
+    logo: "credit-mutuel.png",
     id: 1,
     connectionType: ConnectionType.POWENS,
   },
   {
     name: "Crédit Mutuel de Bretagne",
+    logo: "credit-mutuel.png",
     id: 14,
     connectionType: ConnectionType.POWENS,
   },
   {
     name: "Crédit Mutuel du Sud Ouest",
+    logo: "credit-mutuel.png",
     id: 19,
     connectionType: ConnectionType.POWENS,
   },
@@ -149,16 +161,19 @@ export const CONNECTION_SOURCES = [
   },
   {
     name: "Hello bank!",
+    logo: "hello-bank.png",
     id: 33,
     connectionType: ConnectionType.POWENS,
   },
   {
     name: "ING France",
     id: 7,
+    logo: "ing.png",
     connectionType: ConnectionType.POWENS,
   },
   {
     name: "La Banque Postale",
+    logo: "banque-postale.png",
     id: 5,
     connectionType: ConnectionType.POWENS,
   },
@@ -169,6 +184,7 @@ export const CONNECTION_SOURCES = [
   },
   {
     name: "LCL",
+    logo: "lcl.png",
     id: 8,
     connectionType: ConnectionType.POWENS,
   },
