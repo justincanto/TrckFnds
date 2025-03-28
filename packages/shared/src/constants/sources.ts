@@ -210,6 +210,24 @@ export const CONNECTION_SOURCES = [
     logo: "societe-generale.png",
   },
   {
+    name: "Trade Republic",
+    id: 1190,
+    logo: "trade-republic.png",
+    connectionType: ConnectionType.POWENS,
+  },
+  {
+    name: "Revolut",
+    id: 524,
+    logo: "revolut.png",
+    connectionType: ConnectionType.POWENS,
+  },
+  {
+    name: "N26",
+    id: 418,
+    logo: "n26.png",
+    connectionType: ConnectionType.POWENS,
+  },
+  {
     name: "Ethereum Wallet",
     logo: "ethereum.png",
     popular: true,
