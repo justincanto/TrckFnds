@@ -7,7 +7,6 @@ import ChartModule from "@/components/dashboard/ChartModule";
 import axios from "axios";
 import { OverviewStats } from "@/components/dashboard/OverviewStats";
 import { LogOutIcon, UserIcon } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 import { PortfolioData } from "@/types/portfolio";
 import { formatCurrency } from "@/utils/format";
@@ -33,6 +32,9 @@ import {
   RevenuesAndExpensesByMonth,
 } from "@trckfnds/shared";
 import BarChartRenderer from "@/components/renderer/BarChartRenderer";
+import { useUser } from "@/providers/user";
+import { logout } from "@/services/auth";
+import { useRouter } from "next/navigation";
 
 const areaChartConfig = {
   balance: {
@@ -122,7 +124,8 @@ export default function Dashboard() {
   const [revenuesAndExpensesEvolution, setRevenuesAndExpensesEvolution] =
     useState<null | RevenuesAndExpensesByMonth>(null);
 
-  const { data: session } = useSession();
+  const { user, setUserContext } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     getPortfolioData().then((response) => {
@@ -146,6 +149,13 @@ export default function Dashboard() {
     }));
   }, [portfolioData]);
 
+  const handleLogout = async () => {
+    await logout();
+
+    setUserContext(null);
+    router.push("/");
+  };
+
   return (
     <div className="flex-col flex">
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -165,7 +175,7 @@ export default function Dashboard() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-red-600 flex justify-between"
-                  onClick={async () => await signOut()}
+                  onClick={handleLogout}
                 >
                   Logout
                   <LogOutIcon />
@@ -174,7 +184,7 @@ export default function Dashboard() {
             </DropdownMenu>
           </div>
         </div>
-        {session?.user?.hasConnections ? (
+        {user?.hasConnections ? (
           <div className="space-y-4">
             <OverviewStats portfolioData={portfolioData} />
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

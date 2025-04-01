@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/drizzle-adapter": "^1.7.4",
     "@hookform/resolvers": "^3.9.1",
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-accordion": "^1.2.1",
@@ -31,7 +30,6 @@
     "drizzle-orm": "^0.37.0",
     "lucide-react": "^0.446.0",
     "next": "14.2.13",
-    "next-auth": "^5.0.0-beta.25",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.54.0",

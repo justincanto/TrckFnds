@@ -16,7 +16,7 @@ subscriptionRouter.post("/create-checkout-session", async (req, res) => {
 });
 
 subscriptionRouter.get("/create-portal-session", async (req, res) => {
-  const user = res.locals.session.user as User;
+  const user = req.user!;
 
   const portalSession = await createPortalSession(user);
   res.send({ sessionUrl: portalSession.url! });

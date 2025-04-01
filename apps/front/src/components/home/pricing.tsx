@@ -6,9 +6,9 @@ import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
 import axios from "axios";
+import { useUser } from "@/providers/user";
 
 const createCheckoutSession = async (isAnnualPlan: boolean) => {
   const res = await axios.post(
@@ -40,7 +40,7 @@ const includedFeatures = [
 ];
 
 export const PricingSection = () => {
-  const { data } = useSession();
+  const { user } = useUser();
   const [isAnnualPlan, setIsAnnualPlan] = useState(true);
 
   return (
@@ -141,7 +141,7 @@ export const PricingSection = () => {
                     {isAnnualPlan ? "/year" : "/month"}
                   </span>
                 </p>
-                {data?.user?.id ? (
+                {user?.id ? (
                   <Button
                     className="mt-10 w-full bg-emerald-400 text-neutral-950 hover:bg-emerald-500"
                     onClick={() => createCheckoutSession(isAnnualPlan)}

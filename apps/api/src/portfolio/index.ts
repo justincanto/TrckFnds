@@ -13,7 +13,7 @@ import { TimeRange } from "@trckfnds/shared";
 const portfolioRouter = createRouter();
 
 portfolioRouter.get("/overview", async (req, res) => {
-  const user = res.locals.session.user as User;
+  const user = req.user!;
 
   const portfolioOverview = await getPortfolioOverview(user.id);
 
@@ -21,7 +21,7 @@ portfolioRouter.get("/overview", async (req, res) => {
 });
 
 portfolioRouter.get("/evolution", async (req, res) => {
-  const { user } = res.locals.session;
+  const user = req.user!;
   const timeRange = (req.query.timeRange as TimeRange) || TimeRange.MONTH;
 
   const portfolioEvolution = await getPortfolioEvolution(user.id, timeRange);
@@ -30,7 +30,7 @@ portfolioRouter.get("/evolution", async (req, res) => {
 });
 
 portfolioRouter.post("/connect/ethereum-wallet", async (req, res) => {
-  const user = res.locals.session.user as User;
+  const user = req.user!;
 
   const { name, address, blockchains } = req.body;
 
@@ -45,7 +45,7 @@ portfolioRouter.post("/connect/ethereum-wallet", async (req, res) => {
 });
 
 portfolioRouter.post("/connect/bitcoin-wallet", async (req, res) => {
-  const user = res.locals.session.user as User;
+  const user = req.user!;
 
   const { name, addresses } = req.body;
 
@@ -55,7 +55,7 @@ portfolioRouter.post("/connect/bitcoin-wallet", async (req, res) => {
 });
 
 portfolioRouter.post("/connect/binance", async (req, res) => {
-  const user = res.locals.session.user as User;
+  const user = req.user!;
 
   const { name, apiKey, secretKey } = req.body;
 
@@ -70,7 +70,7 @@ portfolioRouter.post("/connect/binance", async (req, res) => {
 });
 
 portfolioRouter.get("/revenues-expenses/evolution", async (req, res) => {
-  const { user } = res.locals.session;
+  const user = req.user!;
 
   const revenuesAndExpensesByMonth = await getRevenueAndExpensesByMonth(
     user.id

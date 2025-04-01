@@ -6,7 +6,7 @@ const bankRouter = createRouter();
 
 bankRouter.get("/connection-url", async (req, res) => {
   const { query } = req;
-  const user = res.locals.session.user as User;
+  const user = req.user!;
 
   const connectionUrl = await getConnectionUrl(user, Number(query.connectorId));
 
@@ -14,7 +14,7 @@ bankRouter.get("/connection-url", async (req, res) => {
 });
 
 bankRouter.get("/accounts", async (req, res) => {
-  const user = res.locals.session.user as User;
+  const user = req.user!;
 
   const accounts = await getAccounts(user.id);
 
