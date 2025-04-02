@@ -29,21 +29,13 @@ export const users = pgTable("user", {
 
 export type User = InferSelectModel<typeof users>;
 
-export const sessions1 = pgTable("sessions1", {
+export const sessions = pgTable("session", {
   id: text("id").primaryKey(),
   data: text("data").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
-
-export const sessions = pgTable("session", {
-  sessionToken: text("sessionToken").primaryKey(),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
 });
 
 export const bankConnection = pgTable("bankConnection", {

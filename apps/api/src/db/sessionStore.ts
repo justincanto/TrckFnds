@@ -1,7 +1,7 @@
 import { SessionData, Store } from "express-session";
 import { eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { sessions1 } from "./schema";
+import { sessions } from "./schema";
 import * as schema from "./schema";
 
 // Create a custom session store that extends the Express session Store
@@ -15,7 +15,7 @@ export class DrizzleSessionStore extends Store {
   }) {
     super();
     this.db = options.db;
-    this.tableName = options.tableName || "sessions1";
+    this.tableName = options.tableName || "sessions";
   }
 
   // Get a session by its ID
@@ -25,8 +25,8 @@ export class DrizzleSessionStore extends Store {
   ): void {
     this.db
       .select()
-      .from(sessions1)
-      .where(eq(sessions1.id, sid))
+      .from(sessions)
+      .where(eq(sessions.id, sid))
       .then((res) => {
         if (res.length === 0 || !res[0]) {
           return callback(null, null);
@@ -56,14 +56,14 @@ export class DrizzleSessionStore extends Store {
       const data = JSON.stringify(session);
 
       this.db
-        .insert(sessions1)
+        .insert(sessions)
         .values({
           id: sid,
           data,
           expiresAt,
         })
         .onConflictDoUpdate({
-          target: sessions1.id,
+          target: sessions.id,
           set: {
             data,
             expiresAt,
@@ -79,8 +79,8 @@ export class DrizzleSessionStore extends Store {
   // Destroy/delete a session
   destroy(sid: string, callback?: (err?: any) => void): void {
     this.db
-      .delete(sessions1)
-      .where(eq(sessions1.id, sid))
+      .delete(sessions)
+      .where(eq(sessions.id, sid))
       .then(() => callback && callback())
       .catch((err) => callback && callback(err));
   }
@@ -95,9 +95,9 @@ export class DrizzleSessionStore extends Store {
       const expiresAt = session.cookie.expires || this.getExpiryDate(session);
 
       this.db
-        .update(sessions1)
+        .update(sessions)
         .set({ expiresAt })
-        .where(eq(sessions1.id, sid))
+        .where(eq(sessions.id, sid))
         .then(() => callback && callback())
         .catch((err) => callback && callback(err));
     } catch (err) {
@@ -116,8 +116,8 @@ export class DrizzleSessionStore extends Store {
   // Optional: Add a cleanup function to periodically remove expired sessions
   cleanup(): Promise<void> {
     return this.db
-      .delete(sessions1)
-      .where(eq(sessions1.expiresAt, new Date()))
+      .delete(sessions)
+      .where(eq(sessions.expiresAt, new Date()))
       .then();
   }
 }
