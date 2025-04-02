@@ -17,7 +17,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }, [user, loading, router]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-16 h-16 border-4 border-emerald-50 border-t-4 border-t-neutral-950 rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
   return user ? <>{children}</> : null;
