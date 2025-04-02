@@ -1,4 +1,3 @@
-import { PricingSection } from "@/components/home/pricing";
 import { SignIn } from "@/components/trckfndr/signIn";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +34,7 @@ export default function Home() {
             size="lg"
             className="mr-4 bg-emerald-400 hover:bg-emerald-500"
           >
-            <a href="#pricing">Get Started</a>
+            Get Started
           </Button>
           <Button
             size="lg"
@@ -78,10 +77,6 @@ export default function Home() {
               icon={<LockIcon className="w-12 h-12 text-emerald-400" />}
             />
           </div>
-        </section>
-
-        <section id="pricing">
-          <PricingSection />
         </section>
 
         <section className="container mx-auto px-4 py-20 text-center">

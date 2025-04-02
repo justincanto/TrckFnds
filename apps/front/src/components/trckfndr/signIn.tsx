@@ -21,14 +21,10 @@ export const SignIn = () => {
       </Button>
     );
   }
-  return user.isSubscribed ? (
+
+  return (
     <Link href="/dashboard" className="flex items-center">
       Dashboard
-      <LucideArrowUpRight className="w-4 h-4 ml-1" />
-    </Link>
-  ) : (
-    <Link href="#pricing" className="flex items-center">
-      Subscribe
       <LucideArrowUpRight className="w-4 h-4 ml-1" />
     </Link>
   );
