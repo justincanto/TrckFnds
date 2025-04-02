@@ -10,23 +10,6 @@ import { Button } from "../ui/button";
 import axios from "axios";
 import { useUser } from "@/providers/user";
 
-const createCheckoutSession = async (isAnnualPlan: boolean) => {
-  const res = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/subscription/create-checkout-session`,
-    {
-      priceId: isAnnualPlan
-        ? PRICING_PLANS_ID.YEARLY
-        : PRICING_PLANS_ID.MONTHLY,
-    },
-    {
-      withCredentials: true,
-    }
-  );
-
-  const { sessionUrl } = res.data;
-  window.location = sessionUrl;
-};
-
 const PRICING_PLANS_ID = {
   YEARLY: "trckfnds-yearly-v1",
   MONTHLY: "trckfnds-monthly-v1",
@@ -142,10 +125,7 @@ export const PricingSection = () => {
                   </span>
                 </p>
                 {user?.id ? (
-                  <Button
-                    className="mt-10 w-full bg-emerald-400 text-neutral-950 hover:bg-emerald-500"
-                    onClick={() => createCheckoutSession(isAnnualPlan)}
-                  >
+                  <Button className="mt-10 w-full bg-emerald-400 text-neutral-950 hover:bg-emerald-500">
                     Get started
                   </Button>
                 ) : (

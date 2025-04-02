@@ -7,7 +7,6 @@ import portfolioRouter from "./portfolio";
 import "./currency/cron";
 import "./portfolio/cron";
 import "./bank/cron";
-import subscriptionRouter, { subscriptionWebhookRouter } from "./subscription";
 import passport from "passport";
 import session from "express-session";
 import authRouter from "./auth";
@@ -28,8 +27,6 @@ app.use(
 );
 
 app.set("trust proxy", true);
-
-app.use("/", subscriptionWebhookRouter);
 
 app.use(express.json());
 
@@ -55,7 +52,6 @@ app.use("/auth", authRouter);
 
 app.use("/bank", authenticatedUser, bankRouter);
 app.use("/portfolio", authenticatedUser, portfolioRouter);
-app.use("/subscription", authenticatedUser, subscriptionRouter);
 app.use("/user", authenticatedUser, userRouter);
 
 app
