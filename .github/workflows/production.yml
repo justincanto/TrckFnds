@@ -4,7 +4,9 @@ on:
     branches:
       - main
     paths:
-      - "trck-fndr-api/**"
+      - "apps/api/**"
+      - "packages/shared/**"
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-24.04
@@ -25,7 +27,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $VM_USER@$VM_IP << EOF
             # Navigate to project directory
-            cd /home/ubuntu/TrckFnds/trck-fndr-api
+            cd /home/ubuntu/apps/TrckFnds/apps/api
 
             # Ensure using SSH remote
             git remote set-url origin git@github.com:justincanto/TrckFnds.git
@@ -36,7 +38,6 @@ jobs:
             
             # Export environment variables
             export PORT=${{ secrets.PORT }}
-            export AUTH_SECRET=${{ secrets.AUTH_SECRET }}
             export AUTH_GOOGLE_ID=${{ secrets.AUTH_GOOGLE_ID }}
             export AUTH_GOOGLE_SECRET=${{ secrets.AUTH_GOOGLE_SECRET }}
             export DATABASE_URL=${{ secrets.DATABASE_URL }}
@@ -47,7 +48,8 @@ jobs:
             export COIN_GECKO_API_KEY=${{ secrets.COIN_GECKO_API_KEY }}
             export FREE_CURRENCY_API_KEY=${{ secrets.FREE_CURRENCY_API_KEY }}
             export FRONT_URL=${{ secrets.FRONT_URL }}
-            export NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
+            export API_BASE_URL=${{ secrets.API_BASE_URL }}
+            export SESSION_SECRET=${{ secrets.SESSION_SECRET }}
             
             # Rebuild and restart containers
             docker compose down

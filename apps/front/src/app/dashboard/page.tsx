@@ -12,12 +12,6 @@ import { PortfolioData } from "@/types/portfolio";
 import { formatCurrency } from "@/utils/format";
 import { AssetsAccordion } from "@/components/dashboard/AssetsAccordion";
 import { AddConnection } from "@/components/dashboard/add-connection/AddConnection";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ASSET_CATEGORY_LABEL } from "@/constants/portfolio";
 import {
   Select,
@@ -35,6 +29,7 @@ import BarChartRenderer from "@/components/renderer/BarChartRenderer";
 import { useUser } from "@/providers/user";
 import { logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const areaChartConfig = {
   balance: {
@@ -89,18 +84,6 @@ const getPortfolioEvolution = async (timeRange: TimeRange) => {
       withCredentials: true,
     }
   );
-};
-
-const createPortalSession = async () => {
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/subscription/create-portal-session`,
-    {
-      withCredentials: true,
-    }
-  );
-
-  const { sessionUrl } = res.data;
-  window.location = sessionUrl;
 };
 
 const getRevenuesAndExpensesEvolution = async () => {
@@ -163,25 +146,10 @@ export default function Dashboard() {
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
           <div className="flex items-center gap-x-4">
             <AddConnection />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="p-1.5">
-                  <UserIcon className="w-5 h-5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={createPortalSession}>
-                  Billing
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-red-600 flex justify-between"
-                  onClick={handleLogout}
-                >
-                  Logout
-                  <LogOutIcon />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button variant="ghost" onClick={handleLogout}>
+              {" "}
+              <LogOutIcon />
+            </Button>
           </div>
         </div>
         {user?.hasConnections ? (
